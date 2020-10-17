@@ -1,0 +1,3 @@
+[submodule "extensions"]
+	path = extensions
+	url = git@github.com:antoniocgj/RISC-V-ALE-Extensions.git

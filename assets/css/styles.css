@@ -1,0 +1,24 @@
+.modal {
+  pointer-events: none;
+}
+
+.content_area {
+  height: 100%;
+  width: 100%;
+  margin-top: 70px;
+  transition: width .5s;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+#modal_terminal .modal-header {
+  cursor: move;
+}
+
+#xterm-container {
+  height: 40vh;
+  width: 100%;
+}
+

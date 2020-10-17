@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "number": 17,
+      "desc": "getcwd: get current working directory",
+      "action": {"builtin": true}
+    }, 
+    {
+      "number": 25,
+      "desc": "fcntl: manipulate file descriptor",
+      "action": {"builtin": true}
+    }
+  ]
+}

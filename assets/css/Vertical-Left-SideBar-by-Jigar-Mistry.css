@@ -1,0 +1,129 @@
+.first-main-menu {
+  overflow: auto!important;
+  overflow-x: hidden !important;
+  height: 100vh!important;
+}
+
+.main-leftsidebar-div .nav-link {
+  border-radius: 0;
+  padding: 0.2rem 1rem!important;
+}
+
+[data-component='leftsidebar'] .leftsidebar {
+  position: fixed;
+  z-index: 1;
+}
+
+[data-component='leftsidebar'] .first-menu {
+  position: fixed;
+  background-color: #ffffff;
+  height: 100vw;
+  width: 62px;
+  top: 49px;
+  border-color: white;
+  box-shadow: 0px 2px 25px 0px;
+  overflow: hidden;
+  transition: width .5s;
+}
+
+[data-component='leftsidebar'] .first-menu a {
+  color: #041e42;
+}
+
+[data-component='leftsidebar'] .first-menu i {
+  font-size: 24px;
+}
+
+[data-component='leftsidebar'] .first-menu span {
+  font-size: 15px;
+  font-family: 'Nunito Sans';
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  /*display: none;*/
+}
+
+[data-component='leftsidebar'] .first-menu:hover span {
+  opacity: 1;
+  visibility: visible;
+  display: initial;
+}
+
+[data-component='leftsidebar'] .first-menu .list-group-item {
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+[data-component='leftsidebar'] .first-menu li:hover {
+  background-color: rgba(7,7,7,0.06);
+  border-right: 5px solid rgb(255,199,44);
+}
+
+[data-component='leftsidebar'] .first-menu:hover {
+  width: 220px;
+}
+
+[data-component='leftsidebar'] .list-group-item {
+  font-size: 15px;
+}
+
+[data-component='leftsidebar'] .submenu {
+  position: fixed;
+  left: 220px;
+  width: 220px;
+  margin-top: -42px;
+  background-color: white;
+  box-shadow: 0px 3px 5px 0px;
+  opacity: 0;
+  visibility: hidden;
+  line-height: normal!important;
+  transition: 300ms opacity 300ms, 300ms visibility 300ms;
+}
+
+[data-component='leftsidebar'] .submenu a {
+  color: black !important;
+}
+
+[data-component='leftsidebar'] .submenu li:hover {
+  border-left: none;
+  border-right: 5px solid rgb(133,135,150);
+}
+
+[data-component='leftsidebar'] .first-menu li:hover .submenu {
+  visibility: visible;
+  opacity: 1;
+}
+
+[data-component='leftsidebar'] .sub-submenu {
+  position: fixed;
+  background-color: white;
+  left: 440px;
+  margin-top: -38px;
+  width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 300ms opacity 300ms, 300ms visibility 300ms;
+  box-shadow: 0px 3px 10px 0px;
+}
+
+[data-component='leftsidebar'] .sub-submenu a {
+  color: black !important;
+}
+
+[data-component='leftsidebar'] .sub-submenu .list-group-item:hover {
+  background-color: rgba(7,7,7,0.06);
+  border-right: 5px solid rgb(133,135,150);
+}
+
+[data-component='leftsidebar'] .submenu li:hover .sub-submenu {
+  visibility: visible;
+  opacity: 1;
+}
+
+[data-component='leftsidebar'] .list-group-item {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  width: 100%;
+}
+

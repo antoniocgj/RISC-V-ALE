@@ -1,0 +1,9 @@
+{
+  "lab1": {
+    "main_page": "",
+    "assistant_script": "",
+    "config": {
+      "options":{}, "syscalls":{}, "devices":{}
+    }
+  }
+}

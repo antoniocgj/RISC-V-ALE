@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "name": "Uóli",
+      "desc": "Simulador de robo Uóli",
+      "action": "uoli.js"
+    },
+    {
+      "name": "Sound Synthesizer",
+      "desc": "16-channel MIDI sound synthesizer",
+      "action": "midi_synthesizer.js"
+    }
+  ]
+}

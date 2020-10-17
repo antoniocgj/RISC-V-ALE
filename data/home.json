@@ -1,0 +1,62 @@
+{
+  "activities": [
+    {
+      "title": "lab 6",
+      "subtitle": "Calculadora",
+      "text": "Implemente as funções seno, cosseno, tangente e raiz quadrada.",
+      "link1": "",
+      "option1": "Start",
+      "link2": "",
+      "option2": "More Info"
+    },
+    {
+      "title": "lab 7",
+      "subtitle": "Leitor de faixas",
+      "text": "Identifique as faixas de uma estrada a partir de um vídeo.",
+      "link1": "",
+      "option1": "Start",
+      "link2": "",
+      "option2": "More Info"
+    }
+  ],
+  "tutorials": [
+    {
+      "title": "RISC-V ALE",
+      "subtitle": "Introducing RISC-V ALE",
+      "text": "This tutorial walks you through the basic features of RISC-V ALE",
+      "link1": "",
+      "option1": "Start",
+      "link2": "",
+      "option2": ""
+    },
+    {
+      "title": "debugging",
+      "subtitle": "Interactive Mode",
+      "text": "",
+      "link1": "",
+      "option1": "Start",
+      "link2": "",
+      "option2": ""
+    }
+  ],
+  "resources": [
+    {
+      "title": "Reference Card",
+      "subtitle": "Cheatsheet",
+      "text": "Presents a summary of instructions and register available in the RISC-V ISA",
+      "link1": "",
+      "option1": "Read",
+      "link2": "",
+      "option2": "Download"
+    },
+    {
+      "title": "RISC-V Book",
+      "subtitle": "Book",
+      "text": "",
+      "link1": "",
+      "option1": "Read",
+      "link2": "",
+      "option2": "Download"
+    }
+  ]
+}
