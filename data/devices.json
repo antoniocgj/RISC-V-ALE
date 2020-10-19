@@ -3,7 +3,7 @@
     {
       "name": "Uóli",
       "desc": "Simulador de robo Uóli",
-      "action": "uoli.js"
+      "action": "uoli_robot.js"
     },
     {
       "name": "Sound Synthesizer",

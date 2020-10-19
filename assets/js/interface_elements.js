@@ -13,6 +13,7 @@ if ('serviceWorker' in navigator) {
 import {MMIO_Manager} from "../../modules/mmio_manager.js";
 import {WebTerminal} from "../../modules/terminal.js";
 import {Assistant} from "../../modules/assistant.js";
+import {bus_helper} from "../../extensions/devices/utils.js";
 
 var mmio_manager = new MMIO_Manager();
 var web_terminal = new WebTerminal(document.getElementById('xterm-container'), document.getElementById("terminal_badge"));
@@ -30,7 +31,7 @@ class InterfaceNavegation{
   }
 
   addTab(name, icon, id, content){
-    this.tabs.push(id);
+    this.tabs.push(id+ "_tab");
     settings_nav_item.insertAdjacentHTML('beforebegin', `
     <li class="nav-item list-group-item pl-1 py-2">
       <a class="nav-link" href="#${id}">
@@ -40,7 +41,7 @@ class InterfaceNavegation{
     `);
 
     settings_tab.insertAdjacentHTML('beforebegin', `
-    <div id="${id}" class="content_area" hidden="true">
+    <div id="${id+ "_tab"}" class="content_area" hidden="true">
       <div class="container">${content}</div>
     </div>
     `);
@@ -318,7 +319,7 @@ window.load_device = async function (name, slot){
   if(slot == undefined){
     slot = mmio_manager.getFreeSlot();
   }
-  const module = await import("./extensions/devices/" + name);
+  const module = await import("../../extensions/devices/" + name);
   config.add_device(name, slot);
   new module.default(slot);
 }
@@ -343,13 +344,12 @@ window.load_syscall = function(value) {
 function add_syscall_to_table(number, desc, code) {
   var rowId = $("#table_syscalls >tbody >tr").length;
   rowId = 0// rowId + 1;
-  console.log("RowId is "+rowId);
   $('#table_syscalls').bootstrapTable('insertRow',{
       index: rowId,
       row: {
         "number": number,
         "desc": desc,
-        "action": {"builtin": false, "number":number, "code":code}
+        "action": {builtin: false, number, code, checked:"checked"}
       }
   });
 }
@@ -359,20 +359,20 @@ function add_syscall_to_table(number, desc, code) {
 
 window.syscall_action_formatter = function(value) {
   if(value.builtin){
-    return `<div class="custom-control custom-control-inline disabled custom-switch"><input type="checkbox" class="custom-control-input" id=id="syscall_checkbox-${value.number}" checked disabled /><label class="custom-control-label" for=id="syscall_checkbox-${value.number}"></label></div>`;
+    return `<div class="custom-control custom-control-inline disabled custom-switch"><input type="checkbox" class="custom-control-input" id="syscall_checkbox-${value.number}" checked disabled /><label class="custom-control-label" for="syscall_checkbox-${value.number}"></label></div>`;
   }
-  return `<div class="custom-control custom-control-inline disabled custom-switch" onclick="window.load_syscall('${value}');"><input type="checkbox" class="custom-control-input" id=id="syscall_checkbox-${value.number}" /><label class="custom-control-label" for=id="syscall_checkbox-${value.number}"></label></div>`;
+  return `<div class="custom-control custom-control-inline disabled custom-switch" onchange="window.load_syscall('${value}');"><input type="checkbox" class="custom-control-input" id="syscall_checkbox-${value.number}" ${value.checked}/><label class="custom-control-label" for="syscall_checkbox-${value.number}"></label></div>`;
 }
 
 os_tab_stdio_refresh.onclick = function() {
   if(os_tab_stdin_radio.checked){
-    term.setSTDIN(os_tab_stdio_textarea.value)
+    web_terminal.setSTDIN(os_tab_stdio_textarea.value)
   }else if(os_tab_stdout_radio.checked){
-    os_tab_stdio_textarea.value = term.getSTDOUT()
+    os_tab_stdio_textarea.value = web_terminal.getSTDOUT()
   }else{
-    os_tab_stdio_textarea.value = term.getSTDERR()
+    os_tab_stdio_textarea.value = web_terminal.getSTDERR()
   }
-}
+}.bind(this);
 
 os_tab_stdin_radio.onchange = function () {
   if(os_tab_stdin_radio.checked){

@@ -1,8 +1,8 @@
 /*jshint esversion: 6 */
 
 var stdinBuffer = "";
+var stdinBufferString = "";
 const sim_ctrl_ch = new BroadcastChannel('simulator_control');
-
 
 
 onmessage = function(e) {
@@ -13,9 +13,10 @@ onmessage = function(e) {
     case "start_sim":  
       importScripts("whisper.js");
       break;
-    // case "stdin":
-    //   stdinBuffer = e.data.stdin;
-    //   break;
+    case "stdin":
+      stdinBufferString = e.data.stdin;
+      console.log(stdinBufferString);
+      break;
     // case "set_args":
     //   Module.arguments = e.data.vec;
     //   break;
@@ -117,7 +118,6 @@ class SyscallEmulator{
 var syscall_emulator = new SyscallEmulator();
 var intController = new InterruptionController();
 
-var stdinBufferString = "";
 
 function loadStdin (){
   var e_idx = Atomics.load(stdinBuffer, 1);

@@ -15,7 +15,7 @@ export class WebTerminal{
       {
         checkArity: false,
         prompt: '$ ',
-        greetings: "Welcome to RISC-V ALE!"
+        greetings: "Welcome to RISC-V ALE"
       }
     );
     this.term.parent = this;
@@ -98,12 +98,12 @@ export class WebTerminal{
 
   }
 
-  setSTDIN(){
-
+  setSTDIN(value){
+    this.stdio_ch.postMessage({fh:-1, init_stdin:true, data:value});
   }
 
   getSTDOUT(){
-
+    
   }
 
   getSTDERR(){

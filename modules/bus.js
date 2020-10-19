@@ -22,10 +22,10 @@ class MMIO{
 class Bus{
   constructor(sharedArraySize=0x10000){
     this.sharedArraySize = sharedArraySize;
-    this.startSimulator();
     this.stdio_ch = new BroadcastChannel("stdio_channel");
     this.sim_ctrl_ch = new BroadcastChannel('simulator_control');
     this.bus_ch = new BroadcastChannel('bus_channel');
+    this.startSimulator();
     this.stdio_ch.onmessage = function (e) {
       if(e.data.fh==0){ // stdin
         // this.simulator.postMessage({type: "stdin", stdin: e.data.data});
@@ -45,6 +45,8 @@ class Bus{
         }
         Atomics.store(this.interactiveBuffer, i,  0);
         Atomics.store(this.interactiveBuffer, 0, 1);
+      }else if(e.data.init_stdin){
+        this.simulator.postMessage({type: "stdin", stdin: e.data.data});
       }
     }.bind(this);
     this.sim_ctrl_ch.onmessage = function (e) {
@@ -52,6 +54,11 @@ class Bus{
         if(e.data.cmd == "stop_simulator"){
           this.restartSimulator();
         }
+      }
+    }.bind(this);
+    this.bus_ch.onmessage = function (e) {
+      if(e.data.write && !e.data.committed){
+        this.mmio.store(e.data.addr, e.data.size, e.data.value);
       }
     }.bind(this);
   }
@@ -72,10 +79,10 @@ class Bus{
           // TODO
           break;
         case "mmio_write":
-          this.bus_ch.postMessage({sim_write:true, addr: e.data.addr, size: e.data.size, value: e.data.value, mmio: this.mmio.sharedBuffer})
+          this.bus_ch.postMessage({write:true, addr: e.data.addr, size: e.data.size, value: e.data.value})
           break;
         case 'device_message':
-          this.bus_ch.postMessage({so_emulation:true, syscall: e.data.syscall, data: e.data.msg});
+          this.bus_ch.postMessage({so_emulation:true, syscall: e.data.syscall, data: e.data.message});
           break;
         default:
           console.log("w: " + e.data);
