@@ -1,18 +1,18 @@
 {
   "activities": [
     {
-      "title": "lab 6",
-      "subtitle": "Calculadora",
-      "text": "Implemente as funções seno, cosseno, tangente e raiz quadrada.",
+      "title": "Calculator",
+      "subtitle": "Easy",
+      "text": "Implement a simple calculator that performs additions and multiplications",
       "link1": "",
       "option1": "Start",
       "link2": "",
       "option2": "More Info"
     },
     {
-      "title": "lab 7",
-      "subtitle": "Leitor de faixas",
-      "text": "Identifique as faixas de uma estrada a partir de um vídeo.",
+      "title": "Hello World",
+      "subtitle": "Very easy",
+      "text": "Say hello using RISC-V assembly",
       "link1": "",
       "option1": "Start",
       "link2": "",

@@ -4,7 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>RISC-V ALE 2</title>
+    <title>RISC-V ALE</title>
+    <meta name="description" content="Learn RISC-V Assembly Language with this online interactive learning environment.">
+    <meta property="og:type" content="">
+    <meta property="og:image" content="assets/img/logo_square.png">
     <link rel="icon" type="image/png" sizes="883x877" href="assets/img/logo_square.png">
     <link rel="icon" type="image/png" sizes="1240x1236" href="assets/img/logo_circle.png">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
@@ -58,7 +61,7 @@
                     </div>
                 </form>
                 <ul class="nav navbar-nav float-right flex-nowrap ml-auto">
-                    <li class="nav-item dropdown no-arrow mx-1"><input class="d-none" type="file" id="codeSelector" multiple><button class="btn btn-warning" data-toggle="tooltip" data-bs-tooltip="" data-placement="bottom" id="terminal_button" type="button" title="Terminal" style="height: 49px;width: 63px;"><i class="fas fa-terminal"></i><span class="badge badge-pill badge-danger" id="terminal_badge" hidden="true">.</span></button>
+                    <li class="nav-item dropdown no-arrow mx-1"><input class="d-none" type="file" id="codeSelector" multiple=""><button class="btn btn-warning" data-toggle="tooltip" data-bs-tooltip="" data-placement="bottom" id="terminal_button" type="button" title="Terminal" style="height: 49px;width: 63px;"><i class="fas fa-terminal"></i><span class="badge badge-pill badge-danger" id="terminal_badge" hidden="true">.</span></button>
                         <button
                             class="btn btn-info" data-toggle="tooltip" data-bs-tooltip="" data-placement="bottom" id="file_select_button" type="button" title="Load File" style="height: 49px;width: 63px;"><i class="fas fa-file-upload"></i></button>
                             <div class="btn-group" id="run_button_group" style="height: 49px;"><button class="btn btn-primary" id="run_button" type="button" style="background: #ffffff;color: #041e42;">&nbsp;RUN</button><button class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false"
@@ -69,9 +72,9 @@
                 </ul>
             </div>
         </nav>
-        <div class="d-xl-flex align-items-xl-center" id="sidebar-wrapper1" style="border-color: #ffc72c;"><button class="btn btn-primary d-xl-flex justify-content-xl-center align-items-xl-center" data-bs-hover-animate="rubberBand" id="assistant_button" type="button" style="width: 16;height: 27px;padding-right: 0px;padding-left: 0;"><i class="far fa-eye justify-content-xl-start" style="margin-right: auto;margin-left: auto;"></i></button></div>
-        <div
-            class="d-flex flex-column" id="content-wrapper">
+        <div class="d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center" id="sidebar-wrapper1" style="border-color: #ffc72c;"><button class="btn btn-primary d-flex d-lg-flex d-xl-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center" data-bs-hover-animate="rubberBand" id="assistant_button"
+                type="button" style="width: 16;height: 27px;padding-right: 0px;padding-left: 0;"><i class="far fa-eye justify-content-xl-start" style="margin-right: auto;margin-left: auto;"></i></button></div>
+        <div class="d-flex flex-column" id="content-wrapper">
             <div class="modal fade" role="dialog" tabindex="-1" id="modal_terminal" data-keyboard="false" data-backdrop="static">
                 <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -90,14 +93,17 @@
                         <div class="modal-header">
                             <h4 class="modal-title">Assistant</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
                         <div class="modal-body" style="overflow-x: auto;">
-                            <div id="assistant_container"></div>
+                            <div id="assistant_container">
+                                <p id="assistant_intro">Nothing here</p>
+                                <ol id="assistant_test_list"></ol>
+                            </div>
                         </div>
-                        <div class="modal-footer"></div>
+                        <div class="modal-footer"><button class="btn btn-primary" id="assistant_run_button" type="button">run tests</button></div>
                     </div>
                 </div>
             </div>
             <div id="home_tab" class="content_area">
-                <div class="container">
+                <div class="container" style="height: 100%;width: 100%;">
                     <div class="row" id="home_header">
                         <div class="col-md-12" style="padding-bottom: 10px;border-color: #ffc72c;">
                             <div class="card">
@@ -121,7 +127,7 @@
                             <ul class="list-group" id="home_tab_resources_list" style="max-height: 75vh;overflow-y: auto;"></ul>
                         </div>
                     </div>
-                    <div class="row" id="selected_content" hidden="true"></div>
+                    <div class="row" id="selected_content" hidden="true" style="height: 100%;width: 100%;"></div>
                 </div>
             </div>
             <div id="hardware_tab" class="content_area" hidden="true">
@@ -228,94 +234,97 @@
                     </div>
                 </div>
             </div>
-    </div>
-    <div id="os_tab" class="content_area" hidden="true">
-        <div class="container">
-            <div class="row">
-                <div class="col text-center">
-                    <div class="custom-control custom-control-inline custom-switch" style="width: 243px;"><input class="custom-control-input" type="checkbox" id="enable_so_checkbox" checked=""><label class="custom-control-label" for="enable_so_checkbox" style="width: 228px;">Enable Operating System</label></div>
+        </div>
+        <div id="os_tab" class="content_area" hidden="true">
+            <div class="container">
+                <div class="row">
+                    <div class="col text-center">
+                        <div class="custom-control custom-control-inline custom-switch" style="width: 243px;"><input class="custom-control-input" type="checkbox" id="enable_so_checkbox" checked=""><label class="custom-control-label" for="enable_so_checkbox" style="width: 228px;">Enable Operating System</label></div>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col">
-                            <form>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col">
+                                <form>
+                                    <fieldset>
+                                        <legend>Startup Configuration</legend>
+                                        <div class="form-group"><label class="d-inline-block">Stack Pointer:&nbsp;&nbsp;</label><input class="form-control form-control-sm d-inline-flex" type="text" id="so_stack_pointer_value" value="0x7FFFFFC" style="width: 126px;"></div>
+                                    </fieldset>
+                                    <fieldset></fieldset>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
                                 <fieldset>
-                                    <legend>Startup Configuration</legend>
-                                    <div class="form-group"><label class="d-inline-block">Stack Pointer:&nbsp;&nbsp;</label><input class="form-control form-control-sm d-inline-flex" type="text" id="so_stack_pointer_value" value="0x7FFFFFC" style="width: 126px;"></div>
-                                </fieldset>
-                                <fieldset></fieldset>
-                            </form>
+                                    <legend>Standard IO</legend>
+                                </fieldset><input type="file" id="stdio_file_input" hidden="true">
+                                <div class="custom-control custom-control-inline custom-radio" style="padding-top: 13px;"><input class="custom-control-input" type="radio" id="os_tab_stdin_radio" name="stdio_select" value="stdin" checked=""><label class="custom-control-label" for="os_tab_stdin_radio">STDIN</label></div>
+                                <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stdout_radio" name="stdio_select" value="stdout"><label class="custom-control-label" for="os_tab_stdout_radio">STDOUT</label></div>
+                                <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stderr_radio" name="stdio_select" value="stderr"><label class="custom-control-label" for="os_tab_stderr_radio">STDERR</label></div>
+                                <div class="btn-group float-right"
+                                    role="group"><button class="btn btn-primary d-flex d-xl-flex align-items-xl-center" id="os_tab_stdio_refresh" type="button"><i class="material-icons d-inline-block d-xl-flex align-items-xl-center">refresh</i></button><button class="btn btn-primary d-flex d-xl-flex align-items-xl-center"
+                                        id="os_tab_stdio_upload" type="button"><i class="material-icons d-inline-block d-xl-flex align-items-xl-center">file_upload</i></button><button class="btn btn-primary d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center"
+                                        id="os_tab_stdio_download" type="button"><i class="material-icons d-xl-flex align-items-xl-center">file_download</i></button></div><textarea class="form-control-lg" id="os_tab_stdio_textarea" style="width: 100%;min-height: 40vh;margin-top: 10px;"
+                                    rows="20"></textarea></div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <fieldset>
-                                <legend>Standard IO</legend>
-                            </fieldset><input type="file" id="stdio_file_input" hidden="true">
-                            <div class="custom-control custom-control-inline custom-radio" style="padding-top: 13px;"><input class="custom-control-input" type="radio" id="os_tab_stdin_radio" name="stdio_select" value="stdin" checked=""><label class="custom-control-label" for="os_tab_stdin_radio">STDIN</label></div>
-                            <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stdout_radio" name="stdio_select" value="stdout"><label class="custom-control-label" for="os_tab_stdout_radio">STDOUT</label></div>
-                            <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stderr_radio" name="stdio_select" value="stderr"><label class="custom-control-label" for="os_tab_stderr_radio">STDERR</label></div>
-                            <div class="btn-group float-right"
-                                role="group"><button class="btn btn-primary d-flex d-xl-flex align-items-xl-center" id="os_tab_stdio_refresh" type="button"><i class="material-icons d-inline-block d-xl-flex align-items-xl-center">refresh</i></button><button class="btn btn-primary d-flex d-xl-flex align-items-xl-center"
-                                    id="os_tab_stdio_upload" type="button"><i class="material-icons d-inline-block d-xl-flex align-items-xl-center">file_upload</i></button><button class="btn btn-primary d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center"
-                                    id="os_tab_stdio_download" type="button"><i class="material-icons d-xl-flex align-items-xl-center">file_download</i></button></div><textarea class="form-control-lg" id="os_tab_stdio_textarea" style="width: 100%;min-height: 40vh;margin-top: 10px;"
-                                rows="20"></textarea></div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <fieldset>
-                        <legend>Syscalls</legend>
-                    </fieldset>
-                    <div id="table_syscalls_toolbar"><button class="btn btn-info d-xl-flex align-items-xl-center" type="button"><i class="material-icons d-inline-block">add</i><span class="d-inline-block" style="padding: 0px;">New</span>&nbsp;</button></div>
-                    <div class="table-responsive d-inline-block"
-                        style="max-height: 75vh;overflow-y: auto;">
-                        <table class="table" id="table_syscalls" data-pagination="true" data-search="true" data-show-refresh="true" data-url="./data/syscalls.json" data-toolbar="#table_syscalls_toolbar" data-click-to-select="true" data-show-footer="true"
-                            data-id-field="id" data-page-list="[5, 10, 25, 50, 100, all]" data-page-size="5">
-                            <thead>
-                                <tr>
-                                    <th data-sortable="true" data-field="number">number</th>
-                                    <th data-sortable="true" data-field="desc">Description</th>
-                                    <th data-sortable="true" data-field="action" data-formatter="window.syscall_action_formatter"></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="settings_tab" class="content_area" hidden="true">
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <form>
+                    <div class="col-md-6">
                         <fieldset>
-                            <legend>Configuration Export</legend>
+                            <legend>Syscalls</legend>
                         </fieldset>
-                    </form><button class="btn btn-primary" id="settings_tab_conf_load_options" type="button">Save OS options</button>
-                    <div class="btn-group float-right justify-content-xl-end" role="group"><button class="btn btn-primary" id="settings_tab_conf_generate" type="button">generate</button><button class="btn btn-primary" id="settings_tab_conf_export" type="button">Export</button></div><textarea class="d-block" id="settings_tab_conf_export_desc"
-                        style="width: 100%;height: 40vh;" readonly=""></textarea></div>
-                <div class="col">
-                    <form>
-                        <fieldset>
-                            <legend>Simulator Log</legend>
-                        </fieldset><textarea class="form-control d-block" id="settings_tab_simulator_log" style="width: 100%;height: 40vh;"></textarea></form>
+                        <div id="table_syscalls_toolbar"><button class="btn btn-info d-xl-flex align-items-xl-center" type="button"><i class="material-icons d-inline-block">add</i><span class="d-inline-block" style="padding: 0px;">New</span>&nbsp;</button></div>
+                        <div class="table-responsive d-inline-block"
+                            style="max-height: 75vh;overflow-y: auto;">
+                            <table class="table" id="table_syscalls" data-pagination="true" data-search="true" data-show-refresh="true" data-url="./data/syscalls.json" data-toolbar="#table_syscalls_toolbar" data-click-to-select="true" data-show-footer="true"
+                                data-id-field="id" data-page-list="[5, 10, 25, 50, 100, all]" data-page-size="5">
+                                <thead>
+                                    <tr>
+                                        <th data-sortable="true" data-field="number">number</th>
+                                        <th data-sortable="true" data-field="desc">Description</th>
+                                        <th data-sortable="true" data-field="action" data-formatter="window.syscall_action_formatter"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div id="settings_tab" class="content_area" hidden="true">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <form>
+                            <fieldset>
+                                <legend>Configuration Export</legend>
+                            </fieldset>
+                        </form>
+                        <div class="form-group"><label>Description URL:&nbsp;</label><input class="d-inline" type="text" id="conf_export_desc_url"></div>
+                        <div class="form-group"><label>Assistant Script:&nbsp;</label><input class="d-inline" type="file" id="conf_export_assistant_script"></div>
+                        <div class="btn-group float-right justify-content-xl-end" role="group"><button class="btn btn-primary" id="settings_tab_conf_generate" type="button">generate LINK</button><button class="btn btn-primary" id="settings_tab_conf_export" type="button">Export</button></div><textarea class="d-block" id="settings_tab_conf_export_desc"
+                            style="width: 100%;height: 40vh;" readonly=""></textarea></div>
+                    <div class="col">
+                        <form>
+                            <fieldset>
+                                <legend>Simulator Log</legend>
+                            </fieldset><textarea class="form-control d-block" id="settings_tab_simulator_log" style="width: 100%;height: 40vh;"></textarea></form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     </div>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.js"></script>
+    <script src="assets/js/bootstrap-table.min.js"></script>
     <script type="module" src="assets/js/interface_elements.js"></script>
+    <script src="assets/js/jquery-ui.min.js"></script>
     <script src="assets/js/jquery.terminal.min.js"></script>
+    <script src="assets/js/lz-string.min.js"></script>
 </body>
 
 </html>

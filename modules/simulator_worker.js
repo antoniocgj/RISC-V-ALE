@@ -138,7 +138,8 @@ function getStdin (){
   }
   c = stdinBufferString.charCodeAt(0);
   stdinBufferString = stdinBufferString.slice(1);
-  if(c == 0xFFFF){
+  console.log(c);
+  if(c==0 || c == 0xFFFF){
     return null;
   }
   return c;

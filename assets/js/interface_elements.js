@@ -42,7 +42,7 @@ class InterfaceNavegation{
 
     settings_tab.insertAdjacentHTML('beforebegin', `
     <div id="${id+ "_tab"}" class="content_area" hidden="true">
-      <div class="container">${content}</div>
+      ${content}
     </div>
     `);
   }
@@ -58,8 +58,11 @@ class InterfaceNavegation{
       document.getElementById(newHash).hidden = false;
     }else{
       home_tab.hidden = false;
-      if(newHash.slice(0, 16) == "#select_content"){
-        config.load_content(newHash.split("=")[1]);
+      console.log(location.hash);
+      if(location.hash.slice(0, 15) == "#select_content"){
+        config.load_content(location.hash.split("=")[1]);
+      }else if(location.hash.slice(0, 19) == "#select_url_content"){
+        config.load_content_string(location.hash.slice(20));
       }
     }
   }
@@ -110,11 +113,15 @@ class ConfigurationManager{
     }
   }
 
+  load_configuration_json(config_json){
+    this.load_configuration(JSON.parse(config_json));
+  }
+
   load_configuration(new_config){
-    this.currentConfig = new_config; // JSON.parse(config_json);
+    this.currentConfig = new_config;
     // options
     for (const opt in this.currentConfig.options) {
-      if(opt in this.trackedOptions.checkboxes){
+      if(this.trackedOptions.checkboxes.includes(opt)){
         document.getElementById(opt).checked = this.currentConfig.options[opt];   
       }else{
         document.getElementById(opt).value = this.currentConfig.options[opt];
@@ -130,7 +137,18 @@ class ConfigurationManager{
   }
 
   get_config_json(){
-    return JSON.stringify(this.currentConfig);
+    return this.currentConfig;
+  }
+
+  load_content_string(base64Data){
+    var cData = LZString.decompressFromEncodedURIComponent(atob(base64Data));
+    var configs = JSON.parse(cData);
+    home_header.hidden = true;
+    content_selection.hidden = true;
+    selected_content.hidden = false;
+    selected_content.insertAdjacentHTML('beforeend', `<iframe style="width:100%;height:100%" src="${configs.main_page}" frameborder="0"></iframe>`);
+    assistant.setScript(configs.assistant_script);
+    this.load_configuration(configs.config);
   }
 
   load_content(id) {
@@ -139,7 +157,7 @@ class ConfigurationManager{
     selected_content.hidden = false;
     fetch('../../data/config.json').then(function (request) {
       request.json().then(function (configs) {
-        selected_content.insertAdjacentHTML('beforeend', configs[id].main_page);
+        selected_content.insertAdjacentHTML('beforeend', `<iframe style="width:100%;height:100%" src="${configs[id].main_page}" frameborder="0"></iframe>`);
         assistant.setScript(configs[id].assistant_script);
         this.load_configuration(configs[id].config);
       });
@@ -405,12 +423,23 @@ os_tab_stdio_download.onclick = function() {
 }
 
 // tab settings_tab_simulator_log
-settings_tab_conf_load_options.onclick = function(){
-  config.log_current_options();
-}
 
 settings_tab_conf_generate.onclick = function (){
-  settings_tab_conf_export_desc.value = config.get_config_json();
+  config.log_current_options();
+  const conf = config.get_config_json();
+  if(conf_export_assistant_script.files.length){
+    var file = conf_export_assistant_script.files[0];
+    var reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+      settings_tab_conf_export_desc.value = location.origin + location.pathname + "#select_url_content=" + btoa(LZString.compressToEncodedURIComponent(JSON.stringify({main_page: conf_export_desc_url.value, assistant_script: evt.target.result, config: conf})));
+    }.bind(this);
+    reader.onerror = function (evt) {
+      console.log("error reading file", evt);
+    };
+  }else{
+    settings_tab_conf_export_desc.value = location.origin + location.pathname + "#select_url_content=" + btoa(LZString.compressToEncodedURIComponent(JSON.stringify({main_page: conf_export_desc_url.value, assistant_script: "", config: conf})));
+  }
 }
 
 settings_tab_conf_export.onclick = function () {

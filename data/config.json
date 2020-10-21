@@ -1,6 +1,6 @@
 {
-  "lab1": {
-    "main_page": "",
+  "calculator": {
+    "main_page": "./data/aux/calculator.html",
     "assistant_script": "",
     "config": {
       "options":{}, "syscalls":{}, "devices":{}
