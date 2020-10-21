@@ -64,6 +64,7 @@ class InterfaceNavegation{
       }else if(location.hash.slice(0, 19) == "#select_url_content"){
         config.load_content_string(location.hash.slice(20));
       }
+      location.hash = "";
     }
   }
 }

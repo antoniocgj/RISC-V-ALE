@@ -1,7 +1,7 @@
 {
   "calculator": {
-    "main_page": "./data/aux/calculator.html",
-    "assistant_script": "",
+    "main_page": "./data/html/calculator.html",
+    "assistant_script": "./data/html/calculator.js",
     "config": {
       "options":{}, "syscalls":{}, "devices":{}
     }
