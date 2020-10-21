@@ -19,7 +19,7 @@ var mmio_manager = new MMIO_Manager();
 var web_terminal = new WebTerminal(document.getElementById('xterm-container'), document.getElementById("terminal_badge"));
 var assistant = new Assistant(document.getElementById('assistant_container'), document.getElementById('assistant_button'));
 
-var bus = new Worker("../../modules/bus.js");
+var bus = new Worker("./modules/bus.js");
 
 // load plugins
 
@@ -156,7 +156,7 @@ class ConfigurationManager{
     home_header.hidden = true;
     content_selection.hidden = true;
     selected_content.hidden = false;
-    fetch('../../data/config.json').then(function (request) {
+    fetch('./data/config.json').then(function (request) {
       request.json().then(function (configs) {
         selected_content.insertAdjacentHTML('beforeend', `<iframe style="width:100%;height:100%" src="${configs[id].main_page}" frameborder="0"></iframe>`);
         assistant.setScript(configs[id].assistant_script);
@@ -316,7 +316,7 @@ function load_content_from_json(list, item_list) {
   }
 }
 
-fetch('../../data/home.json').then(function (request) {
+fetch('./data/home.json').then(function (request) {
   request.json().then(function (home_contents) {
     load_content_from_json(home_tab_activities_list, home_contents.activities);
     load_content_from_json(home_tab_tutorials_list, home_contents.tutorials);

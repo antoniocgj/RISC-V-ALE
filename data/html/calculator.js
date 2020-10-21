@@ -1,5 +1,5 @@
 // Example of assistant script 
-import {UI_Helper, Assistant_Script} from "/modules/assistant.js"
+import {UI_Helper, Assistant_Script} from "./modules/assistant.js"
 
 class Calculator extends Assistant_Script{
   constructor(){
