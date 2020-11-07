@@ -2,6 +2,7 @@
 
 var stdinBuffer = "";
 var stdinBufferString = "";
+var mem_write_delay = 0;
 const sim_ctrl_ch = new BroadcastChannel('simulator_control');
 
 
@@ -62,6 +63,11 @@ class MMIO{
     }
     Atomics.store(this.memory[size], (addr/size) | 0, value);
     postMessage({type: "mmio_write", addr: ((0xFFFF0000 | addr) >>> 0), size, value});
+    
+    if(mem_write_delay){
+      let start = performance.now();
+      while(performance.now() - start < mem_write_delay);
+    }
   }
 }
 
@@ -104,6 +110,10 @@ class SyscallEmulator{
     if(a7 in this.syscalls){
       var sendMessage = function(msg){
         postMessage({type: "device_message", syscall: a7, message: msg});
+        if(mem_write_delay){
+          let start = performance.now();
+          while(performance.now() - start < mem_write_delay);
+        }
       };
       eval(this.syscalls[a7]);
       return a0;
@@ -238,14 +248,22 @@ sim_ctrl_ch.onmessage = function (e) {
         break;
 
       case "load_syscall":
-        syscall_emulator.register(parseInt(e.data.value.number), e.data.value.code);
+        syscall_emulator.register(parseInt(e.data.syscall.number), e.data.syscall.code);
         break;
 
       case "disable_syscall":
-        syscall_emulator.unregister(parseInt(e.data.value.number));
+        syscall_emulator.unregister(parseInt(e.data.syscall_number));
+        break;
+      
+      case 'set_freq_limit':
+        let value = e.data.value;
+        if(value == 1000){
+          mem_write_delay = 0;
+        }else{
+          mem_write_delay = 1/value;
+        } 
         break;
 
-      
       default:
         console.log(e.data);
         break;

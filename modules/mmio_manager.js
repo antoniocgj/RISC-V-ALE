@@ -2,7 +2,7 @@ export class MMIO_Manager{
   constructor(){
     this.slots = [];
     this.slot_size = 0x100;
-    this.last_slot = 0xFFFFFFF - this.slot_size;
+    this.last_slot = 0xFFFF - this.slot_size;
     this.next_slot = 0;
   }
 

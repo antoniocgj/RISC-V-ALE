@@ -17,8 +17,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans">
     <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
     <link rel="stylesheet" href="assets/fonts/material-icons.min.css">
+    <link rel="stylesheet" href="assets/css/BrightTheme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
     <link rel="stylesheet" href="assets/css/jquery.terminal.min.css">
+    <link rel="stylesheet" href="assets/css/Material.css">
+    <link rel="stylesheet" href="assets/css/PNotify.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/Top--Right--Left-Navigation-by-Jigar-Mistry.css">
     <link rel="stylesheet" href="assets/css/Vertical-Left-SideBar-by-Jigar-Mistry.css">
@@ -102,7 +105,7 @@
                     </div>
                 </div>
             </div>
-            <div id="home_tab" class="content_area">
+            <div id="home_tab" class="content_area" hidden="true">
                 <div class="container" style="height: 100%;width: 100%;">
                     <div class="row" id="home_header">
                         <div class="col-md-12" style="padding-bottom: 10px;border-color: #ffc72c;">
@@ -130,7 +133,7 @@
                     <div class="row" id="selected_content" hidden="true" style="height: 100%;width: 100%;"></div>
                 </div>
             </div>
-            <div id="hardware_tab" class="content_area" hidden="true">
+            <div id="hardware_tab" class="content_area">
                 <div class="container">
                     <div class="row">
                         <div class="col-md-6">
@@ -160,8 +163,8 @@
                                 </div>
                                 <div class="form-group"><label class="d-inline-block">Memory Limit:&nbsp;&nbsp;</label><input class="custom-range d-inline-block" type="range" id="memory_limit_range" min="1" max="128" step="1" value="128" style="width: 327px;padding-top: 14px;"
                                         name="bus_freq"><small class="form-text text-monospace text-muted d-inline">128MB</small></div>
-                                <div class="form-group"><label class="d-inline-block">Bus Frequency:&nbsp;</label><input class="custom-range d-inline-block" type="range" id="bus_frequency_range" min="1" max="1000" step="1" value="500" style="width: 327px;padding-top: 14px;"
-                                        name="bus_freq"><small class="form-text text-monospace text-muted d-inline">500Hz</small></div>
+                                <div class="form-group"><label class="d-inline-block">Bus Frequency:&nbsp;</label><input class="custom-range d-inline-block" type="range" id="bus_frequency_range" min="1" max="1000" step="1" value="1000" style="width: 327px;padding-top: 14px;"
+                                        name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="bus_frequency_range_indicator">500Hz</small></div>
                                 </fieldset>
                                 </form>
                             </div>
@@ -180,32 +183,7 @@
                                                     <th>Device</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>0xF0000000 -&nbsp;<br>0xF00000FF<br><br></td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>0xF0000100 -&nbsp;<br>0xF00001FF<br><br></td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>0xF0000100 -&nbsp;<br>0xF00001FF<br><br></td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>0xF0000100 -&nbsp;<br>0xF00001FF<br><br></td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>0xF0000100 -&nbsp;<br>0xF00001FF<br><br></td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>0xF0000100 -&nbsp;<br>0xF00001FF<br><br></td>
-                                                    <td></td>
-                                                </tr>
-                                            </tbody>
+                                            <tbody id="mapped_devices_table"></tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -325,6 +303,7 @@
     <script src="assets/js/jquery-ui.min.js"></script>
     <script src="assets/js/jquery.terminal.min.js"></script>
     <script src="assets/js/lz-string.min.js"></script>
+    <script src="assets/js/PNotify.js"></script>
 </body>
 
 </html>

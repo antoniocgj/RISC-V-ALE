@@ -43,16 +43,21 @@ class Bus{
         for (var i = 1; i <= e.data.cmd.length; i++) {
           Atomics.store(this.interactiveBuffer, i,  e.data.cmd.charCodeAt(i-1));
         }
-        Atomics.store(this.interactiveBuffer, i,  0);
+        Atomics.store(this.interactiveBuffer, i, 0);
         Atomics.store(this.interactiveBuffer, 0, 1);
       }else if(e.data.init_stdin){
         this.simulator.postMessage({type: "stdin", stdin: e.data.data});
       }
     }.bind(this);
+    let rnd = Math.random();
+    this.sim_ctrl_ch.postMessage({dst:"bus", bus_starting:true, rnd});
     this.sim_ctrl_ch.onmessage = function (e) {
       if(e.data.dst=="bus"){
         if(e.data.cmd == "stop_simulator"){
           this.restartSimulator();
+        }else if(e.data.bus_starting && e.data.rnd != rnd){
+          this.sim_ctrl_ch.postMessage({type:"message", msg:{type:"notice", title: "Multiple instances detected", text:"We detected multiple instances of RISC-V ALE opened in your browser. We terminated the simulator in older tabs. Refresh the page in case of instability or degraded performance.", delay: Infinity}})
+          close(); // terminate worker
         }
       }
     }.bind(this);

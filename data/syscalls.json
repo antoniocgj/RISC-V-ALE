@@ -9,6 +9,146 @@
       "number": 25,
       "desc": "fcntl: manipulate file descriptor",
       "action": {"builtin": true}
+    },
+    {
+      "number": 29,
+      "desc": "ioctl: manipulate the underlying device parameters of special files",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 35,
+      "desc": "unlinkat",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 46,
+      "desc": "ftruncate",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 49,
+      "desc": "chdir",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 56,
+      "desc": "openat",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 61,
+      "desc": "getdents64: get directory entries",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 62,
+      "desc": "lseek",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 66,
+      "desc": "writev",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 78,
+      "desc": "readlinat",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 79,
+      "desc": "fstatat",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 80,
+      "desc": "fstat",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 214,
+      "desc": "brk",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 57,
+      "desc": "close",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 63,
+      "desc": "read",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 64,
+      "desc": "write",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 93,
+      "desc": " exit",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 94,
+      "desc": " exit_group",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 153,
+      "desc": "times",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 160,
+      "desc": "uname",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 169,
+      "desc": "gettimeofday",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 174,
+      "desc": "getuid",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 175,
+      "desc": "geteuid",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 176,
+      "desc": "getgid",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 177,
+      "desc": "getegid",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 222,
+      "desc": "mmap2",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 1024,
+      "desc": "open",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 1026,
+      "desc": "unlink",
+      "action": {"builtin": true}
+    },
+    {
+      "number": 1038,
+      "desc": "stat",
+      "action": {"builtin": true}
     }
   ]
 }

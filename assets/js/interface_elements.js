@@ -1,11 +1,56 @@
 /*jshint esversion: 9*/
 
+// Notification stacks
+window.stackBottomRight = new PNotify.Stack({
+  dir1: 'up',
+  dir2: 'left',
+  firstpos1: 25,
+  firstpos2: 25,
+  modal: false,
+  maxOpen: Infinity
+});
+
+window.stackBarTop = new PNotify.Stack({
+  modal: false,
+  dir1: 'down',
+  firstpos1: 0,
+  spacing1: 0,
+  push: 'top',
+  maxOpen: Infinity
+});
+
+
+
 // register service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service_worker.js').then(function(reg) {
       console.log('Successfully registered service worker', reg);
   }).catch(function(err) {
-      console.warn('Error while registering service worker', err);
+    PNotify.error({
+      title: 'Service Worker',
+      text: 'Error while registering service worker ' + err,
+      sticker: false,
+      stack: window.stackBottomRight
+    });
+  });
+}else{
+  PNotify.error({
+    title: 'Service Worker',
+    text: 'Failed to register Service Worker.',
+    sticker: false,
+    stack: window.stackBottomRight
+  });
+}
+
+// check for errors
+if(typeof SharedArrayBuffer == "undefined"){
+  PNotify.error({
+    title: 'Unsupported Browser',
+    text: `Your browser is not supported. We recommend using an updated version of Google Chrome, Mozilla Firefox, or Microsoft Edge. <br> Error details: <a href="https://caniuse.com/#feat=sharedarraybuffer" target="_blank">SharedArrayBuffer</a> is not supported or disabled.`,
+    sticker: false,
+    hide: false,
+    closer: false,
+    stack: window.stackBarTop
   });
 }
 
@@ -190,6 +235,19 @@ function download(filename, text) {
 const sim_ctrl_ch = new BroadcastChannel('simulator_control');
 
 sim_ctrl_ch.onmessage = function (ev) {
+  if(ev.data.type == "message"){
+    let msgTypes = {success: PNotify.success, info: PNotify.info, error: PNotify.error, notice: PNotify.notice};
+    var delay = 8000;
+    if(ev.data.msg.delay){ 
+      delay = ev.data.msg.delay;
+    }
+    msgTypes[ev.data.msg.type]({
+      title: ev.data.msg.title,
+      text: ev.data.msg.text,
+      stack: window.stackBottomRight,
+      delay
+    });
+  }
   if(ev.data.dst=="simulator" && ev.data.cmd == "load_syscall" && ev.data.desc){
     add_syscall_to_table(ev.data.value.number, ev.data.desc, ev.data.value.code)
   }
@@ -227,7 +285,7 @@ sim_ctrl_ch.onmessage = function (ev) {
         config.load_syscalls();
       }
       break;
-  
+
     default:
       break;
   }
@@ -245,6 +303,12 @@ function load_file(){
     run_button.setAttribute("class", "btn btn-outline-success");
     sim_ctrl_ch.postMessage({dst: "simulator", cmd: "add_files", files: codeSelector.files});
     // run_button.style.background = "";
+    PNotify.info({
+      title: 'File Loaded',
+      text: 'Name: ' + codeSelector.files[0].name + '',
+      sticker: false,
+      stack: window.stackBottomRight
+    });
   }else{
     run_button.setAttribute("class", "btn btn-outline-secondary");
   }
@@ -331,26 +395,39 @@ memory_limit_range.onchange = function () {
 }
 
 bus_frequency_range.onchange = function () {
-  sim_ctrl_ch.postMessage({dst: "bus", cmd: "set_freq_limit", value: bus_frequency_range.value});
+  let value = bus_frequency_range.value;
+  if(value == 1000){
+    bus_frequency_range_indicator.innerHTML = "unlimited";
+  }else{
+    bus_frequency_range_indicator.innerHTML = value + "Hz";
+  }
+  sim_ctrl_ch.postMessage({dst: "simulator", cmd: "set_freq_limit", value});
 }
 
 window.load_device = async function (name, slot){
   if(slot == undefined){
     slot = mmio_manager.getFreeSlot();
   }
+  document.getElementById("mapped_devices_table").insertAdjacentHTML('beforeend', 
+    `<tr>
+    <td>0xFFFF${slot.toString(16).padStart(4, '0')} - <br />0xFFFF${(slot + mmio_manager.slot_size).toString(16).padStart(4, '0')}<br /><br /></td>
+    <td>${name}</td>
+    </tr>
+    `
+  );
   const module = await import("../../extensions/devices/" + name);
   config.add_device(name, slot);
   new module.default(slot);
 }
 
-
 window.device_action_formatter = function(value) {
-  return `<a onclick="window.load_device('${value}');this.disabled = true;"><i class="material-icons pointer">add</i></a>`;
+  return `<a onclick="window.load_device('${value}');this.hidden = true;"><i class="material-icons pointer">add</i></a>`;
 }
 
 // os tab
 
 window.load_syscall = function(value) {
+  value = JSON.parse(unescape(value));
   if(document.getElementById(`syscall_checkbox-${value.number}`).checked){
     sim_ctrl_ch.postMessage({dst: "simulator", cmd: "load_syscall", syscall: value});
     config.add_syscall(value.number, value);
@@ -373,14 +450,11 @@ function add_syscall_to_table(number, desc, code) {
   });
 }
 
-
-
-
 window.syscall_action_formatter = function(value) {
   if(value.builtin){
     return `<div class="custom-control custom-control-inline disabled custom-switch"><input type="checkbox" class="custom-control-input" id="syscall_checkbox-${value.number}" checked disabled /><label class="custom-control-label" for="syscall_checkbox-${value.number}"></label></div>`;
   }
-  return `<div class="custom-control custom-control-inline disabled custom-switch" onchange="window.load_syscall('${value}');"><input type="checkbox" class="custom-control-input" id="syscall_checkbox-${value.number}" ${value.checked}/><label class="custom-control-label" for="syscall_checkbox-${value.number}"></label></div>`;
+  return `<div class="custom-control custom-control-inline disabled custom-switch" onchange="window.load_syscall('${escape(JSON.stringify(value))}');"><input type="checkbox" class="custom-control-input" id="syscall_checkbox-${value.number}" ${value.checked}/><label class="custom-control-label" for="syscall_checkbox-${value.number}"></label></div>`;
 }
 
 os_tab_stdio_refresh.onclick = function() {
