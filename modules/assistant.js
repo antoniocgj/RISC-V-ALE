@@ -52,11 +52,13 @@ export class Assistant_Script{
     this.stdio_ch = new BroadcastChannel("stdio_channel");
     this.sim_ctrl_ch = new BroadcastChannel("simulator_control");
     this.bus = bus_helper;
+    this.stdioCallback = undefined;
     this.stdio_ch.onmessage = function(e) {
+      if(this.stdioCallback) this.stdioCallback();
       if(e.data.fh==1){
-        this.stdoutBuffer += e.data.data;
+        this.stdoutBuffer += e.data.data+"\n";
       }else if(e.data.fh==2){
-        this.stderrBuffer += e.data.data;
+        this.stderrBuffer += e.data.data+"\n";
       }
     }.bind(this);
 
@@ -65,14 +67,25 @@ export class Assistant_Script{
     };
 
     this.run_interactive_cmd = async function(cmd, timeout=1500){
-      var stdoutBufferSize = stdoutBuffer.length;
+      var stdoutBufferSize = this.stdoutBuffer.length;
       this.stdio_ch.postMessage({fh:-1, debug:true, cmd});
-      await this.sleep(timeout);
-      return stdoutBuffer.slice(stdoutBufferSize);
+      await this.wait_for_output({timeout});
+      await this.sleep(500);
+      return this.stdoutBuffer.slice(stdoutBufferSize);
     };
 
+    this.wait_for_output = async function({msg="", size=1, fh=1, timeout=5000, bufferStart=0} = {}) {
+      return new Promise(resolve =>{
+        this.stdioCallback = function () {
+          var stdioHandler = [this.stdoutBuffer, this.stderrBuffer][fh - 1]; 
+          if(stdioHandler.slice(bufferStart).includes(msg) && (stdioHandler.length - bufferStart >= size)) resolve();
+        }.bind(this);
+        setTimeout(resolve, timeout);
+      });
+    }
+
     this.get_symbol_address = async function(symbol){
-      var symbols = await this.runInteractiveCmd("symbols", 5000);
+      var symbols = await this.run_interactive_cmd("symbols", 5000);
       symbols = symbols.split("\n");
       for(var s in symbols){
         var f = symbols[s].split(" ");
@@ -83,16 +96,29 @@ export class Assistant_Script{
       return -1;
     };
 
+    this.get_symbols = async function(){
+      var symbols = await this.run_interactive_cmd("symbols", 5000);
+      symbols = symbols.split("\n");
+      var symList = {};
+      for(var s in symbols){
+        var f = symbols[s].split(" ");
+        if((f.length == 2)){
+          symList[f[0]] = parseInt(f[1]);
+        }
+      }
+      return symList;
+    };
+
   }
 
   simple_equality_test(stdin, expected_output, timeout=5000){
     return async function () {
       this.set_init_STDIN(stdin);
-      if(!this.run_simulator()){
+      if(!(await this.run_simulator())){
         this.ui.log("No file selected");
         return false;
       }
-      await this.sleep(timeout);
+      await this.wait_for_output({size:expected_output.length, timeout});
       console.log(this.stdoutBuffer);
       const result = this.stdoutBuffer.trim();
       this.ui.log(`Input: ${stdin.slice(0,-2)} Expected: ${expected_output} Result: ${result}`);
@@ -105,7 +131,7 @@ export class Assistant_Script{
     }.bind(this);
   }
 
-  run_simulator(debug) {
+  async run_simulator(debug) {
     if(codeSelector.files.length == 0){
       return false;
     }
@@ -139,6 +165,7 @@ export class Assistant_Script{
     if(debug) args.push("--interactive");
     args.push("--isa", get_checked_ISAs());
     this.sim_ctrl_ch.postMessage({dst: "simulator", cmd: "start", args});
+    this.wait_for_output({msg: "Calling stub instead of sigaction", fh:2});
     return true;
   }
 

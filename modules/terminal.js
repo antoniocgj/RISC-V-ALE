@@ -62,6 +62,8 @@ export class WebTerminal{
         this.term.echo(e.data.data);
       }else if(e.data.fh==2){
         this.term.echo(`[[;darkred;]${e.data.data}]`)
+      }else if(e.data.fh == -1 && e.data.debug){
+        this.term.echo("[[;yellow;]>>> ]" + e.data.cmd);
       }
     }.bind(this);
   }

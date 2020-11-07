@@ -25,13 +25,46 @@ window.stackBarTop = new PNotify.Stack({
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service_worker.js').then(function(reg) {
       console.log('Successfully registered service worker', reg);
+      reg.addEventListener("updatefound", function () {
+        let newWorker = reg.installing;
+        newWorker.addEventListener("statechange", function () {
+          if(newWorker.state == "installed" && navigator.serviceWorker.controller){
+            const update_notice = PNotify.info({
+              title: 'Update received',
+              text: 'A new version of RISC-V ALE is available. Click to update.',
+              sticker: false,
+              delay: Infinity,
+              stack: window.stackBottomRight
+            });
+            update_notice.refs.elem.style.cursor = 'pointer';
+            update_notice.on('click', e => {
+              if ([...update_notice.refs.elem.querySelectorAll('.pnotify-closer *, .pnotify-sticker *')].indexOf(e.target) !== -1) {
+                return;
+              }
+              newWorker.postMessage({ action: 'skipWaiting' });
+              update_notice.update({
+                text: 'Please Wait',
+                icon: 'fas fa-spinner fa-pulse',
+              });
+            });
+          }
+        })
+      })
   }).catch(function(err) {
     PNotify.error({
       title: 'Service Worker',
       text: 'Error while registering service worker ' + err,
       sticker: false,
+      delay: Infinity,
       stack: window.stackBottomRight
     });
+  });
+
+  let refreshing;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (refreshing) return;
+    window.location.reload();
+    refreshing = true;
   });
 }else{
   PNotify.error({

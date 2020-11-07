@@ -10,7 +10,7 @@ class Calculator extends Assistant_Script{
     this.ui.add_test("Addition", async function () {
       const a = this.randint(0, 1000), b = this.randint(0,1000);
       this.set_init_STDIN(`${a} + ${b}\n\0`);
-      if(!this.run_simulator()){
+      if(!(await this.run_simulator())){
         this.ui.log("No file selected");
         return false;
       }
