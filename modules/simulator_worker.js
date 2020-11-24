@@ -62,7 +62,7 @@ class MMIO{
       postMessage({type: "output", subtype: "error", msg: "MMIO Access Error"});
     }
     Atomics.store(this.memory[size], (addr/size) | 0, value);
-    postMessage({type: "mmio_write", addr: ((0xFFFF0000 | addr) >>> 0), size, value});
+    postMessage({type: "mmio_write", addr: (addr >>> 0), size, value});
     
     if(mem_write_delay){
       let start = performance.now();

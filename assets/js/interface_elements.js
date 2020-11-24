@@ -282,7 +282,7 @@ sim_ctrl_ch.onmessage = function (ev) {
     });
   }
   if(ev.data.dst=="simulator" && ev.data.cmd == "load_syscall" && ev.data.desc){
-    add_syscall_to_table(ev.data.value.number, ev.data.desc, ev.data.value.code)
+    add_syscall_to_table(ev.data.syscall.number, ev.data.desc, ev.data.syscall.code)
   }
   if(ev.data.dst != "interface"){
     return;
@@ -450,7 +450,7 @@ window.load_device = async function (name, slot){
   );
   const module = await import("../../extensions/devices/" + name);
   config.add_device(name, slot);
-  new module.default(slot);
+  module.default.setBaseAddress(slot);
 }
 
 window.device_action_formatter = function(value) {

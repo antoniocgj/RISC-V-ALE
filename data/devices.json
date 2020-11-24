@@ -9,6 +9,11 @@
       "name": "Sound Synthesizer",
       "desc": "16-channel MIDI sound synthesizer",
       "action": "midi_synthesizer.js"
+    },
+    {
+      "name": "Self-Driving Car",
+      "desc": "A self-driving car in a city",
+      "action": "self_driving_car.js"
     }
   ]
 }
