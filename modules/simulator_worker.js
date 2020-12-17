@@ -260,7 +260,7 @@ sim_ctrl_ch.onmessage = function (e) {
         if(value == 1000){
           mem_write_delay = 0;
         }else{
-          mem_write_delay = 1/value;
+          mem_write_delay = 1000*(1/value);
         } 
         break;
 

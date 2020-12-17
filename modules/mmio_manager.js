@@ -3,7 +3,7 @@ export class MMIO_Manager{
     this.slots = [];
     this.slot_size = 0x200;
     this.last_slot = 0xFFFF - this.slot_size;
-    this.next_slot = 0;
+    this.next_slot = 0x100;
   }
 
   getSlot(slot){
@@ -11,7 +11,7 @@ export class MMIO_Manager{
   }
 
   getFreeSlot(){
-    while(this.next_slot in this.slots){
+    while(this.slots.includes(this.next_slot)){
       this.next_slot += this.slot_size;
     }
     if(this.next_slot <= this.last_slot){

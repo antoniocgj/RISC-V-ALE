@@ -14,6 +14,11 @@
       "name": "Self-Driving Car",
       "desc": "A self-driving car in a city",
       "action": "self_driving_car.js"
+    },
+    {
+      "name": "GPT",
+      "desc": "General Purpose Timer",
+      "action": "gpt.js"
     }
   ]
 }
