@@ -6,7 +6,7 @@ sw_file = open("service_worker.js", "r")
 sw_data = sw_file.readlines()
 sw_file.close()
 
-files_to_cache = ["/"]
+files_to_cache = ["./"]
 
 for path, subdirs, files in os.walk("."):
   for name in files:

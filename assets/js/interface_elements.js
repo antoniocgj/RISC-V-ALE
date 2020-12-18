@@ -82,6 +82,7 @@ if(typeof SharedArrayBuffer == "undefined"){
     text: `Your browser is not supported. We recommend using an updated version of Google Chrome, Mozilla Firefox, or Microsoft Edge. <br> Error details: <a href="https://caniuse.com/#feat=sharedarraybuffer" target="_blank">SharedArrayBuffer</a> is not supported or disabled.`,
     sticker: false,
     hide: false,
+    textTrusted: true,
     closer: false,
     stack: window.stackBarTop
   });
