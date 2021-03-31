@@ -160,7 +160,7 @@ class ConfigurationManager{
   constructor(){
     this.currentConfig = {options:{}, syscalls:{}, devices:{}}
     this.trackedOptions = {checkboxes: ["config_isaA", "config_isaC", "config_isaD", "config_isaF", "config_isaI", 
-    "config_isaM", "config_isaS", "config_isaU", "enable_so_checkbox"], values: ["so_stack_pointer_value"]};
+    "config_isaM", "config_isaS", "config_isaU", "enable_so_checkbox"], values: ["so_stack_pointer_value", "bus_frequency_range"]};
   }
 
   log_current_options(){
@@ -400,13 +400,14 @@ assistant_button.onclick = function () {
 function load_content_from_json(list, item_list) {
   for (const item in item_list) {
     const element = item_list[item];
+    let params = element.params?element.params:"";
     var code = `
     <li class="list-group-item">
       <div class="card">
           <div class="card-body">
               <h4 class="card-title">${element.title}</h4>
               <h6 class="text-muted card-subtitle mb-2">${element.subtitle}</h6>
-              <p class="card-text">${element.text}</p><a class="card-link" href="${element.link1}">${element.option1}</a><a class="card-link" href="${element.link2}">${element.option2}</a></div>
+              <p class="card-text">${element.text}</p><a class="card-link" ${params} href="${element.link1}">${element.option1}</a><a class="card-link" ${params} href="${element.link2}">${element.option2}</a></div>
       </div>
     </li>
     ` 

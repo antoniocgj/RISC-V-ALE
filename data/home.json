@@ -4,36 +4,18 @@
       "title": "Calculator",
       "subtitle": "Easy",
       "text": "Implement a simple calculator that performs additions and multiplications",
-      "link1": "#select_url_content=TjRJZ3RnaGdsZ2RnK2dCd2djd0tZZ0Z3Z0hRSG9BbUVBTGhMZ0JaRmdBMnVBeGhGYlFLNVhFRDJBVHRoZFNBRFFnSUFaeUZRaEpHRVRoRGFIS0FpS1lRdVhBQUlBb2dBOElZQkZWU3EyQU0xWERSNGlKTlV5NUMxUUIwWVVYWnlLcmdBVlFDU2NBQktvcUJGUU9QbFVBUVJFeENTa0FaVmw1SWdCZlZTTU9OakFISEZ3d05ud1dWQ0ZjTXlqTEltd0FLeUY3RUVkSFdsWVJWUUJoQm1aV0lrNVZWRTBpVkJoOElYRElpMGs0T05zaVlFZFZWVm8yR0hFT0psb09qZ0FLQUVvcG1CbVpvU1lnOVkyQWJtbmRvakl4YkNZb1ZRQmVWUmhVQUhkVmJ6OEF3N1hxZ0JVeUEyS0l6Y3p5Z1ZDb3FsNjRnaC14U2JEQmJCQk1HUWhrT3hDZzh5cUlCT3RSMnV4VXBudytGbVRIRTZRaEJUY1JrNkZ3QmhLZ1JIUk1ET013dVZ4dTJBZ2hMZ2tLSTN4QVlUcERQbTFWQ3dnQW5qQmFDa21KS2hUdE51NW1iczVnczNCQjd0Q3JoeExQaFlMeUFBeWhBQ00rdE5HMUNBQ01OYXloTmh0ZjA5V3REU2F6YWRjYnROYmFoS2dwTEI2V01mZ0FSTHdBT1RXQUFNQUNUQUNESkFEVXFtakZzUzlscTluMTRleDd0MlVDTWF3QWhEYTdUTHBNNFdPd2psc2xSNmkreXFHeGtIeVEyd1VxQ0RONzlDdFVQaHFsbVBSNk9ENm1Cd2RrWUdONjNmM1ZDbnN6TUlNOW9HNGkwSjlLZ0VHc0FLeW0tVjktc3FvUncxRFlldU41ZEVmQnNKaEVBQkNUQ01SbUN1NDkrN2NnLTJWRGNEelBGNnZ0LXZ3V3dJZzVEQVRaSjM3V3NvR1BCc0l4K0NrTUVUR040d1E1TU5FMElJdTN3ZURvM1ZCTVVJQUpRS0ZnaUN3NEEzeUl4Sk16QW10TGk5RG9FRkxNQnkxV1VEcTFVWE0xaklqOTdnZUtNWTFVWENLS3JXZGRrSEloaHgySUNtRlFLamRrU0FKdlcyS2NabEU4U1VuSGFUV0puRDFFbXdDMVlId05ZYlEyTE1sWHhUa2lWRVhSOUM2QUJISmdHSHBNVnlTaEtrT0doZHNtQXRJQ0lCV1JsVEg2VlJHSS1lUXFDZ2VnNVNWRjlUR3RHaTdSMVIxRFZVRjBkMHRHS3RYaXlRblQ0WktuMDlhNUlQTTdrS1Q1R0pQTzgzemhYNFBMTEwwVkE0RlFPeUhLSU1VaXZFQ05zT1NBQmFaQ1V6VEROUlU2aTFqSmtpQ09TNUhrK1FBV1NJa0t3clJTclFtWFp4YXZxeHJRdWExcmVWNDJOVkFBS2g2MU1tWFRjTlJWMm9iZHhuTTU3VjFUS3dGZ1VKSUUwRFpGV3pGU1IxVVNiaURJYkFqSHJUZzFrK2k0NHY2ZElGWDJ0Wkh0VWJxN3BnWjZFeGhpNmNVdW1BbmxlRnBHQ1ktNlRuNEVBVlNNS0JrRXdVQTJBVVJraENKM0g1bng1QTRERUNBd2t3U1RVQUVQR0NkcG9RSUNhUm1sbVp5bVlHcDltSUVEYm1wSlpxbTJicGdBeEVYZWRabW02YThHV3hmNWlXT2NtcFcrWUZ1bVlnMXVYQlk4RFcrZ2dDMTlHa05nNEZvZjVhQUFhd3ROaE5BMWc5cEJJRzNFRFlQVmdqZ0FBM0JncEtVZlZOQUFka2xrT1E2NXhJQkNFTVVaQVlLaHlZd1lBSTVBZkJVQzlzS0NpSnhJczZBQQ==",
+      "link1": "#select_url_content=TjRJZ3RnaGdsZ2RnK2dCd2djd0tZZ0Z3Z1BRQk1JQXVFMkFGZ1dBRGJZREdFRjFBcmhZUVBZQk9BZEdaU0FEUWdRQXpvS2lDaU1BbkVIVTJVQkFVdzVzQUFnQ2lBRHdoZ0VGVk1wWUF6WlVKRmlJRTVkTm56bEFIUmhSdDdBc3VBQlZBSkp3QUVxZ29KVU5sNWxBRUZoVVhGSkFHVVpPUUlBWDJVRE5oWXdPeEFPYkRBV1hDWlVRV3dUQ1BNQ0RnQXJRVnNRZTN0cVptRmxBR0U2Um1ZQ2RtVlVkUUpVR0Z4QlVQQ3pDVGdZNndKZ2UyVmxhaFlZTVRZR2FuYTJBQW9BU2ttWWFlbkJCZ0MxOVlCdUtaMkNFbEVPQmlobEFGNWxHRlFBZDJWUEh6OEQxYXFBRlJJOUl1R0xpZVVBb0ZHVVBURTRMK1NSWW9KWXdKZ3lIMEIwSVVEbWxSQXh4cTJ4MjJCVUVGd3VCbURERXFYQitSY0JnNjUzK2hLZ0JEUk1GTzAzT2wydUhBSnVEZ0VJSVh4QUlUcERMbVZXQ1FnQW5qQnFFa0dKS2hkc05xNW1UdFp2TVhCQTdsRExteHpMaFlMeUFBekJBQ00rdE42MkNBQ01OYXpCQnh0WDA5YXREU2F6U2NjVHROYmJCS2hKTEI2YU52Z0FSRHdBT1ZXQUFNQUNUQUNDSkFEVXltakZ2aXRocXRuMTRheDdwMlVBTXF3QWhLc0lFOW9DNGJYYVpWSkhFeFdJZDFwc2xSN3kreUtDeGtIeVF5d2tpQzlON2RNdFVMZ3FsbVBSNjJENkdHeHRnWTZONjNhUGxDbnM5Tmk2WFBSeEJMcFVBaFZnQldVMzZrZWpsV0NXR29EaXQ5dmxzUzRGZ01BZ0FJUVlCZ01nU1BIcFBMbkhld29MbnUxNElXOTd5ZkY5QWc0QWhaREFEWjUxSFpzb0F2TnNJMitDa01FVEdONHpRNU0xSFVBSUIxd1ZEbzNWQk1zSUFKWHlKZ0NBSTRCdndvK0pNeGdwc0xpOWRvRUNyTUFheFdhREcyVVhOVmhvMzg3bnVLTVkyVVlpNkliWmNkbkhBaEoyMkNDR0ZRQmlkbmlQeHZTMkJkcG1rMlNrbG5SVHVLWEQxNGc0QzFZRndWWWJYck4wbFR4WXhDVXNSd2REMFZBQUVjR0RvZWt4WEpTRXFUWUtGZXdZQzBJSWdaWkdXTVBwbEhZMzg1QW9LQmFEbEpWUDJNYTBtTHRIVkhVTlpRWFVQUzFrcTFOS0pDZFhnc3ZmZGQyVTVia0tUNUtJQXFDa0xoVDRkY1JHMFhRNEJjdHlZb0lNVUtyRUNOQ01TQUJhVENVelRETlJYNmkxTEtWT0NPVUpicmVTcUFCWkNqb3RpMUY2dUNhOEhKYXRyM002dWJldlE1UUFDb2h0VEpsMDNEVVVqb21vOGwxT2UxZFFLc0JZR0NTQjFIV1JWc3kwcWRsQVd3Z1NBNEF4VzNZVlktdk9WSytsU0JVVHRXTjdsRUc1NllBK2hORWR1N0U3cGdSNFhtYWVnT0pCNDQrQkFGVURDZ1pCTUZBRmg1RVpRUnlhSnVZU2VRT0JSQWdFSk1IazFCK0dKMG1tY0VDQkdqWnhZT2JwbUFHWjVpQkF3RmhUT2ZwN25tWUFNVWxvV3VjWjVtUEVWNldSZGwzbUZ2VjRYUmVacUpkZVZzVzNGMTNvSUF0RnJUemdhZy1tb0FCckMwV0hVWFhyYk1CM0VCWVBWQWpnQUEzT2dGTVVmVjFBQWRqbDhQdy01K0orRUVNVnBEb0NnYVl3WUJvNUFYQlVGOTJMOG5KK0pjNkFB",
       "option1": "Start",
       "link2": "",
       "option2": ""
-    },
-    {
-      "title": "Hello World",
-      "subtitle": "Very easy",
-      "text": "Say hello using RISC-V assembly",
-      "link1": "",
-      "option1": "Start",
-      "link2": "",
-      "option2": "More Info"
     }
   ],
   "tutorials": [
     {
-      "title": "RISC-V ALE",
-      "subtitle": "Introducing RISC-V ALE",
-      "text": "This tutorial walks you through the basic features of RISC-V ALE",
-      "link1": "",
-      "option1": "Start",
-      "link2": "",
-      "option2": ""
-    },
-    {
-      "title": "debugging",
-      "subtitle": "Interactive Mode",
-      "text": "",
-      "link1": "",
+      "title": "Getting Started",
+      "subtitle": "",
+      "text": "Instructions on compiling and running a simple code in RISC-V ALE",
+      "link1": "#select_url_content=TjRJZ3RnaGdsZ2RnK2dCd2djd0tZZ0Z3Z1BRQk1JQXVFMkFGZ1dBRGJab0VHekp3RE9SQVRnYXJnSFJtVWdBMElDSTBaUm1FR0FTWUJqRmxBUUZNSWZpQ2tCN0dBRE1veVRLRlh5bzZ4cnBYcXREVVJBQ0NtQWl3Q3VxQVdzM2E0bGdNSzJIVDA2NHVNRUFBaTNvN09abTZXQUdLaHZpN203b0VBa3JIaC1va1FBTEtwZmdtV0FNbzU4WkdCQUtvNXFEQVFBRVlVcUV5cWNGSWtxRklBMXRXcUFCNDVqSTFpN1lpcXNPd3NjQUJ1RUJTT2lnQU1YUURzVWN2TFhnTFY5b3h3R2l5b0FJNk9NRklBbm5BczRtaUtBTXl6SUFDK0FvekhqRkpURk1ZWXdBOGd1S2pqVUZKVUI4dm5jN2tB",
       "option1": "Start",
       "link2": "",
       "option2": ""
@@ -44,19 +26,21 @@
       "title": "Reference Card",
       "subtitle": "Cheatsheet",
       "text": "Presents a summary of instructions and register available in the RISC-V ISA",
-      "link1": "",
+      "link1": "https://riscv-programming.org/book/refcard.html",
       "option1": "Read",
       "link2": "",
-      "option2": "Download"
+      "option2": "",
+      "params": "target=\"popup\""
     },
     {
       "title": "RISC-V Book",
       "subtitle": "Book",
       "text": "",
-      "link1": "",
+      "link1": "https://riscv-programming.org/book/riscv-book.html",
       "option1": "Read",
       "link2": "",
-      "option2": "Download"
+      "option2": "",
+      "params": "target=\"_blank\""
     }
   ]
 }

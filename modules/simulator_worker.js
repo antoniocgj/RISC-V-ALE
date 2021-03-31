@@ -2,7 +2,7 @@
 
 var stdinBuffer = "";
 var stdinBufferString = "";
-var mem_write_delay = 0;
+var mem_write_delay = 33;
 const sim_ctrl_ch = new BroadcastChannel('simulator_control');
 
 
