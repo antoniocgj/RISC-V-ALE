@@ -17,7 +17,7 @@
     <span style="color:#e34adc; ">_start:</span>
         li a0<span style="color:#308080; ">,</span> <span style="color:#008c00; ">1</span>            # file descriptor <span style="color:#308080; ">=</span> <span style="color:#008c00; ">1</span> <span style="color:#308080; ">(</span>stdout<span style="color:#308080; ">)</span>
         la a1<span style="color:#308080; ">,</span> string       # buffer
-        li a2<span style="color:#308080; ">,</span> <span style="color:#008c00; ">18</span>           # <span style="color:#004a43; ">size</span>
+        li a2<span style="color:#308080; ">,</span> <span style="color:#008c00; ">19</span>           # <span style="color:#004a43; ">size</span>
         li a7<span style="color:#308080; ">,</span> <span style="color:#008c00; ">64</span>           # <span style="color:#7779bb; font-weight:bold; ">syscall</span> write <span style="color:#308080; ">(</span><span style="color:#008c00; ">64</span><span style="color:#308080; ">)</span>
         ecall
     
@@ -28,7 +28,7 @@
         ecall
     
     
-    <span style="color:#e34adc; ">string:</span>  .asciz <span style="color:#1060b6; ">"Hello RISC-V ALE!\n"</span>
+    <span style="color:#e34adc; ">string:</span>  .asciz <span style="color:#1060b6; ">"Hello! It works!!!\n"</span>
   </pre>	
     
     
@@ -39,6 +39,7 @@
   <pre style="color:#000020;background:#f6f8ff;">
     $ sudo apt install clang lld
   </pre>
+
   
   <p><b>2.</b> Compile the code:</p>
   
@@ -46,6 +47,8 @@
     $ clang --target=riscv32 -march=rv32gc -mabi=ilp32d -mno-relax hello.s -c -o hello.o
     $ ld.lld hello.o -o hello.x
   </pre>
+  
+  Alternatively, you can download a pre-compiled version of this code <a href="./hello.x">here</a> to test the simulator.
   
   <h2>Running</h2>
   
@@ -58,7 +61,7 @@
   <p>
     A terminal will open and you should see the output of your code's execution.
     <br><br>
-    To exit this tutorial, refresh the page.
+    To exit this tutorial, refresh the page or click <a href="javascript:window.top.location.reload();">here</a>.
   </p>
 
 

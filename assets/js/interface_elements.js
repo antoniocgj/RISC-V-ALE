@@ -417,7 +417,6 @@ function load_content_from_json(list, item_list) {
 
 fetch('./data/home.json').then(function (request) {
   request.json().then(function (home_contents) {
-    load_content_from_json(home_tab_activities_list, home_contents.activities);
     load_content_from_json(home_tab_tutorials_list, home_contents.tutorials);
     load_content_from_json(home_tab_resources_list, home_contents.resources);
   });
