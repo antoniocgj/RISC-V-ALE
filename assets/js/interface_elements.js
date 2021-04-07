@@ -76,29 +76,16 @@ if ('serviceWorker' in navigator) {
 }
 
 // check for errors
-if(typeof SharedArrayBuffer == "undefined"){
-  PNotify.error({
-    title: 'Unsupported Browser',
-    text: `Your browser is not supported. We recommend using an updated version of Google Chrome, Mozilla Firefox, or Microsoft Edge. <br> Error details: <a href="https://caniuse.com/#feat=sharedarraybuffer" target="_blank">SharedArrayBuffer</a> is not supported or disabled.`,
-    sticker: false,
-    hide: false,
-    textTrusted: true,
-    closer: false,
-    stack: window.stackBarTop
-  });
-}
 
 // load modules
 import {MMIO_Manager} from "../../modules/mmio_manager.js";
 import {WebTerminal} from "../../modules/terminal.js";
 import {Assistant} from "../../modules/assistant.js";
-import {bus_helper} from "../../extensions/devices/utils.js";
+import {simulator_controller} from "../../modules/simulator.js";
 
 var mmio_manager = new MMIO_Manager();
 var web_terminal = new WebTerminal(document.getElementById('xterm-container'), document.getElementById("terminal_badge"));
 var assistant = new Assistant(document.getElementById('assistant_container'), document.getElementById('assistant_button'));
-
-var bus = new Worker("./modules/bus.js");
 
 // load plugins
 
@@ -189,7 +176,7 @@ class ConfigurationManager{
   load_syscalls(){
     for (const id in this.currentConfig.syscalls) {
       const value = this.currentConfig.syscalls[id];
-      sim_ctrl_ch.postMessage({dst: "simulator", cmd: "load_syscall", syscall: value});
+      simulator_controller.load_syscall(value.number, value.code);
     }
   }
 
@@ -266,9 +253,9 @@ function download(filename, text) {
 
 //
 
-const sim_ctrl_ch = new BroadcastChannel('simulator_control');
+const sim_status_ch = new BroadcastChannel('simulator_status');
 
-sim_ctrl_ch.onmessage = function (ev) {
+sim_status_ch.onmessage = function (ev) {
   if(ev.data.type == "message"){
     let msgTypes = {success: PNotify.success, info: PNotify.info, error: PNotify.error, notice: PNotify.notice};
     var delay = 8000;
@@ -282,12 +269,6 @@ sim_ctrl_ch.onmessage = function (ev) {
       delay
     });
   }
-  if(ev.data.dst=="simulator" && ev.data.cmd == "load_syscall" && ev.data.desc){
-    add_syscall_to_table(ev.data.syscall.number, ev.data.desc, ev.data.syscall.code)
-  }
-  if(ev.data.dst != "interface"){
-    return;
-  }
   switch (ev.data.type) {
     case "sim_log":
       settings_tab_simulator_log.insertAdjacentHTML('beforeend', ev.data.log.msg + "<br>");
@@ -300,7 +281,7 @@ sim_ctrl_ch.onmessage = function (ev) {
         run_button.style.background = "";
         run_options_selector.setAttribute("disabled", "");
         run_button.onclick = function(){
-          sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
+          simulator_controller.restart_simulator();
         };
         if(!($("#modal_terminal").data('bs.modal') || {})._isShown){
           $('#modal_terminal').modal({backdrop: false,show: true});
@@ -320,6 +301,12 @@ sim_ctrl_ch.onmessage = function (ev) {
       }
       break;
 
+    case "load_syscall":
+      if(ev.data.desc){
+        add_syscall_to_table(ev.data.number, ev.data.desc, ev.data.code);
+      }
+      break;
+
     default:
       break;
   }
@@ -335,7 +322,7 @@ function load_file(){
   if(codeSelector.files.length){
     // label_codeSelector.innerHTML = codeSelector.files;
     run_button.setAttribute("class", "btn btn-outline-success");
-    sim_ctrl_ch.postMessage({dst: "simulator", cmd: "add_files", files: codeSelector.files});
+    simulator_controller.load_files(codeSelector.files);
     // run_button.style.background = "";
     PNotify.info({
       title: 'File Loaded',
@@ -366,7 +353,7 @@ function run_simulator(debug) {
   if(codeSelector.files.length == 0){
     return;
   }
-  sim_ctrl_ch.postMessage({dst: "simulator", cmd: "add_files", files: codeSelector.files});
+  simulator_controller.load_files(codeSelector.files);
   var args = [];
   args.push("/working/" + codeSelector.files[0].name);
   if(enable_so_checkbox.checked) {
@@ -375,7 +362,7 @@ function run_simulator(debug) {
   }
   if(debug) args.push("--interactive");
   args.push("--isa", get_checked_ISAs());
-  sim_ctrl_ch.postMessage({dst: "simulator", cmd: "start", args});
+  simulator_controller.start_execution(args);
 }
 
 run_button.onclick = function(){run_simulator(false);};
@@ -425,7 +412,7 @@ fetch('./data/home.json').then(function (request) {
 // hardware tab
 
 memory_limit_range.onchange = function () {
-  sim_ctrl_ch.postMessage({dst: "simulator", cmd: "set_mem_limit", value: memory_limit_range.value});
+  simulator_controller.set_mem_limit(memory_limit_range.value);
 }
 
 bus_frequency_range.onchange = function () {
@@ -435,7 +422,7 @@ bus_frequency_range.onchange = function () {
   }else{
     bus_frequency_range_indicator.innerHTML = value + "Hz";
   }
-  sim_ctrl_ch.postMessage({dst: "simulator", cmd: "set_freq_limit", value});
+  simulator_controller.set_freq_limit(value);
 }
 
 window.load_device = async function (name, slot){
@@ -463,10 +450,10 @@ window.device_action_formatter = function(value) {
 window.load_syscall = function(value) {
   value = JSON.parse(unescape(value));
   if(document.getElementById(`syscall_checkbox-${value.number}`).checked){
-    sim_ctrl_ch.postMessage({dst: "simulator", cmd: "load_syscall", syscall: value});
+    simulator_controller.load_syscall(value.number, value.code);
     config.add_syscall(value.number, value);
   }else{
-    sim_ctrl_ch.postMessage({dst: "simulator", cmd: "disable_syscall", syscall_number: value.number});
+    simulator_controller.remove_syscall(value.number);
     config.remove_syscall(value.number);
   }
 }

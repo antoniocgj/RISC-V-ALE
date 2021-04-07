@@ -1,12 +1,13 @@
 /*jshint esversion: 6 */
 
-var stdinBuffer = "";
 var stdinBufferString = "";
+var interactiveBufferString = "";
 var mem_write_delay = 33;
-const sim_ctrl_ch = new BroadcastChannel('simulator_control');
-
+var simulator_sleep = [1, 1, 1]; // int, read, write
+var simulator_int_inst_delay = 1000000;
 
 onmessage = function(e) {
+  console.log(e.data);
   switch(e.data.type){
     case "code_load":
       files = e.data.code;
@@ -15,37 +16,59 @@ onmessage = function(e) {
       importScripts("whisper.js");
       break;
     case "stdin":
-      stdinBufferString = e.data.stdin;
+      stdinBufferString += e.data.stdin;
       console.log(stdinBufferString);
       break;
-    // case "set_args":
-    //   Module.arguments = e.data.vec;
-    //   break;
     case "mmio":
-      mmio = new MMIO(e.data.vec);
+      mmio.update_store(e.data.addr, e.data.size, e.data.value);
       break;
-    // case "syscall":
-    //   syscall_emulator.register(parseInt(e.data.num), e.data.code);
-    //   break;
     case "interactive":
-      interactiveBuffer = new Uint8Array(e.data.vec);
-      break;
-    case "stdin_buffer":
-      stdinBuffer = new Uint16Array(e.data.vec);
+      interactiveBufferString += e.data.cmd;
       break;
     case "interrupt":
-      intController.setMemoryTrigger(e.data.vec);
+      intController.changeState(e.data.state);
+      break;
+    case "add_files":
+      files = e.data.files;
+      break;
+    case "start":
+      console.log(e.data.args);
+      Module.arguments = e.data.args;
+      if(e.data.args.includes("--interactive")){
+        postMessage({type:"status", status:{running:true, debugging:true}});
+      }else{
+        postMessage({type:"status", status:{running:true}});
+      } 
+      importScripts("whisper.js");
+      break;
+
+    case "load_syscall":
+      syscall_emulator.register(parseInt(e.data.number), e.data.code);
+      break;
+
+    case "disable_syscall":
+      syscall_emulator.unregister(parseInt(e.data.number));
+      break;
+    
+    case 'set_freq_limit':
+      let value = e.data.value;
+      if(value == 1000){
+        simulator_sleep[2] = 1;
+      }else{
+        simulator_sleep[2] = 1000*(1/value);
+      } 
       break;
   }
 };
 
 class MMIO{
-  constructor(sharedBuffer, bc){
+  constructor(size){
+    this.sharedBuffer = new ArrayBuffer(size);
     this.memory = [];
-    this.memory[1] = new Uint8Array(sharedBuffer);
-    this.memory[2] = new Uint16Array(sharedBuffer);
-    this.memory[4] = new Uint32Array(sharedBuffer);
-    this.size = sharedBuffer.byteLength;
+    this.memory[1] = new Uint8Array(this.sharedBuffer);
+    this.memory[2] = new Uint16Array(this.sharedBuffer);
+    this.memory[4] = new Uint32Array(this.sharedBuffer);
+    this.size = this.sharedBuffer.byteLength;
   }
 
   load(addr, size){
@@ -53,7 +76,8 @@ class MMIO{
     if(addr > this.size){
       postMessage({type: "output", subtype: "error", msg: "MMIO Access Error"});
     }
-    return Atomics.load(this.memory[size], (addr/size) | 0);
+
+    return this.memory[size][(addr/size) | 0];
   }
 
   store(addr, size, value){
@@ -61,23 +85,22 @@ class MMIO{
     if(addr > this.size){
       postMessage({type: "output", subtype: "error", msg: "MMIO Access Error"});
     }
-    Atomics.store(this.memory[size], (addr/size) | 0, value);
     postMessage({type: "mmio_write", addr: (addr >>> 0), size, value});
-    
-    if(mem_write_delay){
-      let start = performance.now();
-      while(performance.now() - start < mem_write_delay);
-    }
+    this.memory[size][(addr/size) | 0] = value;
+  }
+
+  update_store(addr, size, value){
+    addr &= 0xFFFF;
+    this.memory[size][(addr/size) | 0] = value;
   }
 }
+
+var mmio = new MMIO();
+
 
 class InterruptionController{
   constructor(){
     this.state = 0;
-  }
-
-  setMemoryTrigger(vec){
-    this.memoryTrigger = new Uint8Array(vec);
   }
 
   changeState(state){
@@ -85,7 +108,9 @@ class InterruptionController{
   }
 
   get interrupt(){
-    return Atomics.load(this.memoryTrigger, 0);
+    let res = this.state;
+    this.state = 0;
+    return res;
   }
 
   get interruptEnabled(){
@@ -129,58 +154,34 @@ var syscall_emulator = new SyscallEmulator();
 var intController = new InterruptionController();
 
 
-function loadStdin (){
-  var e_idx = Atomics.load(stdinBuffer, 1);
-  if(e_idx == 0) return;
-  while(Atomics.exchange(stdinBuffer, 0,  1) == 1); // lock
-  for (var i = 0; i < e_idx; i++) {
-    stdinBufferString += String.fromCharCode(Atomics.load(stdinBuffer, i+2));
+function getStdin (count){
+  if(stdinBufferString.length == 0){
+    return -1;
   }
-  Atomics.store(stdinBuffer, 1, 0);
-  Atomics.store(stdinBuffer, 0,  0); // free lock
-}
-
-
-function getStdin (){
-  loadStdin();
-  while(stdinBufferString.length == 0){
-    loadStdin();
+  var uint8array = new TextEncoder("utf-8").encode(stdinBufferString);
+  if(uint8array.length >= count){
+    return (new TextDecoder().decode(uint8array.slice(0, count)));
   }
-  c = stdinBufferString.charCodeAt(0);
-  stdinBufferString = stdinBufferString.slice(1);
-  console.log(c);
-  if(c==0 || c == 0xFFFF){
-    return null;
+  if(uint8array.includes(0)){
+    return (new TextDecoder().decode(uint8array));
   }
-  return c;
+  return -1;
 }
 
 function getInteractiveCommand (){
-  while(true){
-    if(Atomics.load(interactiveBuffer, 0) == 1 ){
-      var i = 1;
-      var string = "";
-      var c = Atomics.load(interactiveBuffer, i);
-      while(c != 0){
-        string += String.fromCharCode(c);
-        i++;
-        c = Atomics.load(interactiveBuffer, i);
-      }
-      Atomics.store(interactiveBuffer, 0, 0);
-      return string;
-    }
-  }
+  let res = interactiveBufferString;
+  interactiveBufferString = "";
+  return res;
 }
 
 function initFS() {
-  FS.init(getStdin, null, null);
+  FS.init(null, null, null);
   FS.mkdir('/working');
   if(files){
     FS.mount(WORKERFS, {
       files: files, // Array of File objects or FileList
     }, '/working');
   }
-  // console.log(FS.stat("/working"));
 }
 
 var xhr = new XMLHttpRequest();
@@ -229,45 +230,4 @@ var Module = {
   printErr : function (text) {postMessage({type: "stdio", stdioNumber: 2, msg: text});}
 };
 
-
-sim_ctrl_ch.postMessage({dst:"interface", type:"status", status:{running:false, starting:true}});
-sim_ctrl_ch.onmessage = function (e) {
-  console.log("sim_worker:", e.data);
-  if(e.data.dst=="simulator"){
-    switch (e.data.cmd) {
-      case "add_files":
-        files = e.data.files;
-        break;
-
-      case "start":
-        console.log(e.data.args);
-        Module.arguments = e.data.args;
-        if(e.data.args.includes("--interactive"))  sim_ctrl_ch.postMessage({dst:"interface", type:"status", status:{running:true, debugging:true}});
-        else sim_ctrl_ch.postMessage({dst:"interface", type:"status", status:{running:true}});
-        importScripts("whisper.js");
-        break;
-
-      case "load_syscall":
-        syscall_emulator.register(parseInt(e.data.syscall.number), e.data.syscall.code);
-        break;
-
-      case "disable_syscall":
-        syscall_emulator.unregister(parseInt(e.data.syscall_number));
-        break;
-      
-      case 'set_freq_limit':
-        let value = e.data.value;
-        if(value == 1000){
-          mem_write_delay = 0;
-        }else{
-          mem_write_delay = 1000*(1/value);
-        } 
-        break;
-
-      default:
-        console.log(e.data);
-        break;
-    }
-    
-  }
-}
+postMessage({type:"status", status:{running:false, starting:true}});

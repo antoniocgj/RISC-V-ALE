@@ -1,6 +1,8 @@
 /*jshint esversion: 9*/
 
 import {bus_helper} from "../extensions/devices/utils.js";
+import { simulator_controller } from "../../modules/simulator.js";
+
 
 export class UI_Helper{
   constructor(intro){
@@ -155,7 +157,7 @@ export class Assistant_Script{
     this.unityLog = "";
     this.unityLastLog = "";
     // start sim
-    this.sim_ctrl_ch.postMessage({dst: "simulator", cmd: "add_files", files: codeSelector.files});
+    simulator_controller.load_files(codeSelector.files);
     var args = [];
     args.push("/working/" + codeSelector.files[0].name);
     if(enable_so_checkbox.checked) {
@@ -164,13 +166,13 @@ export class Assistant_Script{
     }
     if(debug) args.push("--interactive");
     args.push("--isa", get_checked_ISAs());
-    this.sim_ctrl_ch.postMessage({dst: "simulator", cmd: "start", args});
+    simulator_controller.start_execution(args);
     this.wait_for_output({msg: "Calling stub instead of sigaction", fh:2});
     return true;
   }
 
   stop_simulator(){
-    this.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
+    simulator_controller.stop_execution();
   }
 
   send_STDIN(value){

@@ -1,13 +1,15 @@
+import { simulator_controller } from "../../modules/simulator.js";
+
 export class WebTerminal{
   constructor(container, badge){
     this.stdio_ch = new BroadcastChannel("stdio_channel");
-    this.sim_ctrl_ch = new BroadcastChannel("simulator_control");
+    this.sim_status_ch = new BroadcastChannel("simulator_status");
     this.container = container;
     this.firstOpen = true;
     this.term = $('#xterm-container').terminal(
       {
         whisper: function(...args) {
-          this.parent.sim_ctrl_ch.postMessage({dst: "simulator", cmd: "start", args});
+          simulator_controller.start_execution(args);
         },
         close: function(arg1, arg2) {
         }
@@ -20,40 +22,39 @@ export class WebTerminal{
     );
     this.term.parent = this;
 
-    this.sim_ctrl_ch.onmessage = function (e) {
-      if(e.data.dst == "interface"){
-        if(e.data.type == "status"){
-          if(e.data.status.running){
-            this.running_mode = true;
-            if(e.data.status.debugging){
-              this.term.push(function (stdin) {
-                this.parent.stdio_ch.postMessage({fh:-1, debug:true, cmd:stdin});
-              },
-              {
-                prompt: '[[;yellow;]>>> ]',
-                keymap: {
-                  'CTRL+C': function(e, original) {
-                    this.parent.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
-                    original();
-                  }, 
-                  'CTRL+D': function(e, original) {
-                    this.parent.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
-                  }
+    this.sim_status_ch.onmessage = function (e) {
+      if(e.data.type == "status"){
+        if(e.data.status.running){
+          this.running_mode = true;
+          if(e.data.status.debugging){
+            this.term.push(function (stdin) {
+              this.parent.stdio_ch.postMessage({fh:-1, debug:true, cmd:stdin});
+            },
+            {
+              prompt: '[[;yellow;]>>> ]',
+              keymap: {
+                'CTRL+C': function(e, original) {
+                  simulator_controller.stop_execution();
+                  original();
+                }, 
+                'CTRL+D': function(e, original) {
+                  // this.parent.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
                 }
-
               }
-              );
-            }else{
-              this.enter_input_mode();
+
             }
-          }else if(this.running_mode){
-            this.term.pop();
-            this.running_mode = false;
+            );
+          }else{
+            this.enter_input_mode();
           }
+        }else if(this.running_mode){
+          this.term.pop();
+          this.running_mode = false;
         }
-      }else if(e.data.dst == "simulator" && e.data.cmd=="start"){
-        this.term.echo(`$ whisper ${e.data.args.join(" ")}`);
-        this.term.history().append(`whisper ${e.data.args.join(" ")}`);
+        if(e.data.status.starting_exec){
+          this.term.echo(`$ whisper ${e.data.status.args.join(" ")}`);
+          this.term.history().append(`whisper ${e.data.status.args.join(" ")}`);
+        }
       }
     }.bind(this);
 
@@ -71,18 +72,18 @@ export class WebTerminal{
 
   enter_input_mode(){
     this.term.push(function (stdin) {
-      this.parent.stdio_ch.postMessage({fh:0, data:stdin});
+      this.parent.stdio_ch.postMessage({fh:0, data:(stdin + "\n\0")});
     },
     {
       prompt: '',
       history: false,
       keymap: {
         'CTRL+C': function(e, original) {
-          this.parent.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
+          simulator_controller.stop_execution();
           original();
         }, 
         'CTRL+D': function(e, original) {
-          this.parent.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
+          // this.parent.sim_ctrl_ch.postMessage({dst:'bus', cmd: "stop_simulator"});
         }
       }
     }
