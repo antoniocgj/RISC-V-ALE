@@ -51,8 +51,9 @@ export class UI_Helper{
 
 export class Assistant_Script{
   constructor(){
-    this.stdio_ch = new BroadcastChannel("stdio_channel");
-    this.sim_ctrl_ch = new BroadcastChannel("simulator_control");
+    if(!window.uniq_id) window.uniq_id = performance.now();
+    this.stdio_ch = new BroadcastChannel("stdio_channel" + window.uniq_id );
+    this.sim_ctrl_ch = new BroadcastChannel("simulator_control" + window.uniq_id );
     this.bus = bus_helper;
     this.stdioCallback = undefined;
     this.stdio_ch.onmessage = function(e) {

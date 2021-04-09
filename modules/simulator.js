@@ -27,9 +27,12 @@ class MMIO{
 
 class SimulatorController{
   constructor(){
-    this.stdio_ch = new BroadcastChannel("stdio_channel");
-    this.sim_status_ch = new BroadcastChannel('simulator_status');
-    this.bus_ch = new BroadcastChannel('bus_channel');
+    if(!window.uniq_id) window.uniq_id = performance.now();
+    this.stdio_ch = new BroadcastChannel("stdio_channel" + window.uniq_id);
+    this.sim_status_ch = new BroadcastChannel('simulator_status' + window.uniq_id);
+    this.bus_ch = new BroadcastChannel('bus_channel' + window.uniq_id);
+    this.bus_freq_limit = 30;
+    this.int_cont_freq_scale = 0;
     this.startSimulator();
     this.stdio_ch.onmessage = function (e) {
       if(e.data.fh==0){ // stdin
@@ -48,7 +51,6 @@ class SimulatorController{
 
   startSimulator(){
     this.simulator = new Worker("./modules/simulator_worker.js");
-    this.mmio = mmio;
     this.simulator.onmessage = function(e){
       switch(e.data.type){
         case "stdio":
@@ -73,6 +75,8 @@ class SimulatorController{
           console.log("w: " + e.data);
       }
     }.bind(this);
+    this.set_freq_limit(this.bus_freq_limit);
+    this.set_int_freq_scale_limit(this.int_cont_freq_scale);
   }
 
   start_execution(args){
@@ -95,11 +99,18 @@ class SimulatorController{
     this.simulator.postMessage({type: "add_files", files});
   }
 
-  set_mem_limit(value){
-    // TODO
+  set_int_freq_scale_limit(value){
+    this.int_cont_freq_scale = value;
+    if(value == 0){
+      this.simulator.postMessage({type: "interrupt_enabled", value: 0});
+    }else{
+      this.simulator.postMessage({type: "interrupt_enabled", value: 1});
+    }
+    this.simulator.postMessage({type: "set_int_delay", value: 10**(10 - value)});
   }
 
   set_freq_limit(value){
+    this.bus_freq_limit = value;
     this.simulator.postMessage({type: "set_freq_limit", value});
   }
 
@@ -115,9 +126,22 @@ class SimulatorController{
 }
 
 class InterruptController{
+  constructor(){
+  }
 
-  
+  interrupt(device_id){
+    if(mmio.load(0xFFFF0008, 4)){
+      return false;
+    }
+    mmio.store(0xFFFF0004, 4, device_id);
+    mmio.store(0xFFFF0008, 4, 1);
+    simulator_controller.triggerInterrupt();
+    return true;
+  }
+
+
 }
 
 export const mmio = new MMIO(0x10000);
 export const simulator_controller = new SimulatorController();
+export const interrupt_controller = new InterruptController();

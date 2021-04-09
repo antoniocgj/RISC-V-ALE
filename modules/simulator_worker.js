@@ -4,7 +4,7 @@ var stdinBufferString = "";
 var interactiveBufferString = "";
 var mem_write_delay = 33;
 var simulator_sleep = [1, 1, 1]; // int, read, write
-var simulator_int_inst_delay = 1000000;
+var simulator_int_inst_delay = 1000;
 
 onmessage = function(e) {
   console.log(e.data);
@@ -49,6 +49,10 @@ onmessage = function(e) {
     case "disable_syscall":
       syscall_emulator.unregister(parseInt(e.data.number));
       break;
+
+    case 'interrupt_enabled':
+      intController.interrupt_enabled = e.data.value;
+      break;
     
     case 'set_freq_limit':
       let value = e.data.value;
@@ -57,6 +61,9 @@ onmessage = function(e) {
       }else{
         simulator_sleep[2] = 1000*(1/value);
       } 
+      break;
+    case "set_int_delay":
+      simulator_int_inst_delay = e.data.value;
       break;
   }
 };
@@ -101,6 +108,7 @@ var mmio = new MMIO();
 class InterruptionController{
   constructor(){
     this.state = 0;
+    this.interrupt_enabled = 1;
   }
 
   changeState(state){
@@ -114,7 +122,7 @@ class InterruptionController{
   }
 
   get interruptEnabled(){
-    return 1;
+    return this.interrupt_enabled;
   }
 }
 

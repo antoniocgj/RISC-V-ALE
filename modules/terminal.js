@@ -2,8 +2,8 @@ import { simulator_controller } from "../../modules/simulator.js";
 
 export class WebTerminal{
   constructor(container, badge){
-    this.stdio_ch = new BroadcastChannel("stdio_channel");
-    this.sim_status_ch = new BroadcastChannel("simulator_status");
+    this.stdio_ch = new BroadcastChannel("stdio_channel" + window.uniq_id );
+    this.sim_status_ch = new BroadcastChannel("simulator_status" + window.uniq_id );
     this.container = container;
     this.firstOpen = true;
     this.term = $('#xterm-container').terminal(
@@ -102,7 +102,7 @@ export class WebTerminal{
   }
 
   setSTDIN(value){
-    this.stdio_ch.postMessage({fh:-1, init_stdin:true, data:value});
+    this.stdio_ch.postMessage({fh:-1, init_stdin:true, data:(value + "\n\0")});
   }
 
   getSTDOUT(){

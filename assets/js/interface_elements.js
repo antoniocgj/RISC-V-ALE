@@ -20,7 +20,6 @@ window.stackBarTop = new PNotify.Stack({
 });
 
 
-
 // register service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service_worker.js').then(function(reg) {
@@ -253,7 +252,7 @@ function download(filename, text) {
 
 //
 
-const sim_status_ch = new BroadcastChannel('simulator_status');
+const sim_status_ch = new BroadcastChannel('simulator_status' + window.uniq_id);
 
 sim_status_ch.onmessage = function (ev) {
   if(ev.data.type == "message"){
@@ -411,8 +410,14 @@ fetch('./data/home.json').then(function (request) {
 
 // hardware tab
 
-memory_limit_range.onchange = function () {
-  simulator_controller.set_mem_limit(memory_limit_range.value);
+int_freq_range.onchange = function () {
+  let value = int_freq_range.value;
+  if(value == 0){
+    int_freq_range_indicator.innerHTML = "1/∞";
+  }else{
+    int_freq_range_indicator.innerHTML = "1/10<sup>"+ (7 - value) +"</sup>";
+  }
+  simulator_controller.set_int_freq_scale_limit(value);
 }
 
 bus_frequency_range.onchange = function () {
@@ -481,6 +486,12 @@ window.syscall_action_formatter = function(value) {
 os_tab_stdio_refresh.onclick = function() {
   if(os_tab_stdin_radio.checked){
     web_terminal.setSTDIN(os_tab_stdio_textarea.value)
+    PNotify.info({
+      title: 'Text loaded to STDIN',
+      text: `${os_tab_stdio_textarea.value.length} chars loaded.`,
+      sticker: false,
+      stack: window.stackBottomRight
+    });
   }else if(os_tab_stdout_radio.checked){
     os_tab_stdio_textarea.value = web_terminal.getSTDOUT()
   }else{

@@ -11,7 +11,6 @@
     <link rel="icon" type="image/png" sizes="883x877" href="assets/img/logo_square.png">
     <link rel="icon" type="image/png" sizes="1240x1236" href="assets/img/logo_circle.png">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Courier+Prime">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans">
@@ -25,6 +24,8 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/Top--Right--Left-Navigation-by-Jigar-Mistry.css">
     <link rel="stylesheet" href="assets/css/Vertical-Left-SideBar-by-Jigar-Mistry.css">
+<link rel="manifest" href="manifest.json">
+<script> window.uniq_id = performance.now(); </script>
 </head>
 
 <body style="overflow: hidden;color: #041e42;">
@@ -95,7 +96,7 @@
                     </div>
                 </div>
             </div>
-            <div id="home_tab" class="content_area">
+            <div id="home_tab" class="content_area" hidden="true">
                 <div class="container" style="height: 100%;width: 100%;">
                     <div class="row" id="home_header">
                         <div class="col-md-12" style="padding-bottom: 10px;border-color: #ffc72c;">
@@ -142,8 +143,8 @@
                                                 <div class="custom-control custom-control-inline custom-checkbox" style="width: 34px;"><input class="custom-control-input" type="checkbox" id="config_isaS" checked=""><label class="custom-control-label" for="config_isaS">S</label></div>
                                                 <div class="custom-control custom-control-inline custom-checkbox" style="width: 34px;"><input class="custom-control-input" type="checkbox" id="config_isaU" checked=""><label class="custom-control-label" for="config_isaU">U</label></div>
                                             </div>
-                                            <div class="form-group"><label class="d-inline-block">Memory Limit:&nbsp;&nbsp;</label><input class="custom-range d-inline-block" type="range" id="memory_limit_range" min="1" max="128" step="1" value="128" style="width: 327px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline">unlimited</small></div>
-                                            <div class="form-group"><label class="d-inline-block">Bus Frequency:&nbsp;</label><input class="custom-range d-inline-block" type="range" id="bus_frequency_range" min="1" max="1000" step="1" value="30" style="width: 327px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="bus_frequency_range_indicator">30Hz</small></div>
+                                            <div class="form-group"><label class="d-inline-block">Int. Controller Freq. Scaling:&nbsp;&nbsp;</label><input class="custom-range d-inline-block" type="range" id="int_freq_range" min="0" max="7" step="1" value="0" style="width: 230px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="int_freq_range_indicator">1/∞<br></small></div>
+                                            <div class="form-group"><label class="d-inline-block">Bus Frequency Limit:&nbsp;</label><input class="custom-range d-inline-block" type="range" id="bus_frequency_range" min="1" max="1000" step="1" value="30" style="width: 288px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="bus_frequency_range_indicator">30Hz</small></div>
                                         </fieldset>
                                     </form>
                                 </div>
@@ -216,8 +217,8 @@
                                         <legend>Standard IO</legend>
                                     </fieldset><input type="file" id="stdio_file_input" hidden="true">
                                     <div class="custom-control custom-control-inline custom-radio" style="padding-top: 13px;"><input class="custom-control-input" type="radio" id="os_tab_stdin_radio" name="stdio_select" value="stdin" checked=""><label class="custom-control-label" for="os_tab_stdin_radio">STDIN</label></div>
-                                    <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stdout_radio" name="stdio_select" value="stdout"><label class="custom-control-label" for="os_tab_stdout_radio">STDOUT</label></div>
-                                    <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stderr_radio" name="stdio_select" value="stderr"><label class="custom-control-label" for="os_tab_stderr_radio">STDERR</label></div>
+                                    <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stdout_radio" name="stdio_select" value="stdout" disabled=""><label class="custom-control-label" for="os_tab_stdout_radio">STDOUT</label></div>
+                                    <div class="custom-control custom-control-inline custom-radio"><input class="custom-control-input" type="radio" id="os_tab_stderr_radio" name="stdio_select" value="stderr" disabled=""><label class="custom-control-label" for="os_tab_stderr_radio">STDERR</label></div>
                                     <div class="btn-group float-right" role="group"><button class="btn btn-primary d-flex d-xl-flex align-items-xl-center" id="os_tab_stdio_refresh" type="button"><i class="material-icons d-inline-block d-xl-flex align-items-xl-center">refresh</i></button><button class="btn btn-primary d-flex d-xl-flex align-items-xl-center" id="os_tab_stdio_upload" type="button"><i class="material-icons d-inline-block d-xl-flex align-items-xl-center">file_upload</i></button><button class="btn btn-primary d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center" id="os_tab_stdio_download" type="button"><i class="material-icons d-xl-flex align-items-xl-center">file_download</i></button></div><textarea class="form-control-lg" id="os_tab_stdio_textarea" style="width: 100%;min-height: 40vh;margin-top: 10px;" rows="20"></textarea>
                                 </div>
                             </div>
