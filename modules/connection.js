@@ -1,4 +1,4 @@
-import {simulator_controller} from "../../modules/simulator.js";
+import {simulator_controller} from "./simulator.js";
 
 class Window_postMessage{
   constructor(isTrusted=false){
@@ -11,16 +11,16 @@ class Window_postMessage{
       conn.run_remote_cmd(msg.data.cmd); 
     }else{
       var operation = conn.operations[msg.data.cmd.op];
-      if(operation) operation.desc;
+      if(operation) operation = operation.desc;
       this.confirmation_dialog(msg.data.name, msg.origin, operation, msg.data.cmd);
     }
   }
 
-  confirmation_dialog(name, origin, operation){
+  confirmation_dialog(name, origin, operation, cmd){
     const notice = PNotify.notice({
       title: `Remote Command Received`,
-      text: `${name} is trying to execute a remote command in the simulator. Do you want to proceed? \n \n Operation: ${operation} \n Interface: window.postMessage \n Origin: ${origin}`,
-      icon: 'fas fa-question-circle',
+      text: `${name} is trying to execute a remote command in the simulator. Do you wish to proceed? \n \n Operation: ${operation} \n Origin: ${origin}`,
+      icon: 'fas fa-exclamation-triangle',
       hide: false,
       closer: false,
       sticker: false,
@@ -38,8 +38,8 @@ class Window_postMessage{
         }]
       ])
     });
-    notice.on('pnotify:confirm', () => conn.run_remote_cmd(msg.data.cmd));
-    notice.on('pnotify:cancel', () => alert('Operation cancelled.'));
+    notice.on('pnotify:confirm', () => conn.run_remote_cmd(cmd));
+    notice.on('pnotify:cancel', () => "");
   }
 }
 
@@ -68,7 +68,7 @@ export class Connection{
     var bytes = base64ToArrayBuffer(params.str64);
     var blob = new Blob([bytes], {type: 'application/binary'});
     let file = new File([blob], params.name);
-    simulator_controller.load_files({files: [file]});
+    simulator_controller.load_files([file]);
   }
 }
 

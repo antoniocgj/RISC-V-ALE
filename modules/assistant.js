@@ -1,7 +1,7 @@
 /*jshint esversion: 9*/
 
 import {bus_helper} from "../extensions/devices/utils.js";
-import { simulator_controller } from "../../modules/simulator.js";
+import { simulator_controller } from "./simulator.js";
 
 
 export class UI_Helper{

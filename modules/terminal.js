@@ -1,4 +1,4 @@
-import { simulator_controller } from "../../modules/simulator.js";
+import { simulator_controller } from "./simulator.js";
 
 export class WebTerminal{
   constructor(container, badge){

@@ -3,16 +3,16 @@
     "name": "RISC-V Assembly Learning Environment",
     "icons": [
         {
-            "src": "/assets/img/logo_square.png",
+            "src": "./assets/img/logo_square.png",
             "type": "image/png",
             "sizes": "877x877"
         },
         {
-            "src": "/assets/img/logo_circle.png",
+            "src": "./assets/img/logo_circle.png",
             "type": "image/png",
             "sizes": "1236x1236"
         }
     ],
-    "start_url": "/index.html",
+    "start_url": "./index.html",
     "display": "fullscreen"
 }
