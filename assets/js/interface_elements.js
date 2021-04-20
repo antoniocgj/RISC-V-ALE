@@ -81,6 +81,7 @@ import {MMIO_Manager} from "../../modules/mmio_manager.js";
 import {WebTerminal} from "../../modules/terminal.js";
 import {Assistant} from "../../modules/assistant.js";
 import {simulator_controller} from "../../modules/simulator.js";
+import {conn} from "../../modules/connection.js";
 
 var mmio_manager = new MMIO_Manager();
 var web_terminal = new WebTerminal(document.getElementById('xterm-container'), document.getElementById("terminal_badge"));
@@ -146,7 +147,7 @@ class ConfigurationManager{
   constructor(){
     this.currentConfig = {options:{}, syscalls:{}, devices:{}}
     this.trackedOptions = {checkboxes: ["config_isaA", "config_isaC", "config_isaD", "config_isaF", "config_isaI", 
-    "config_isaM", "config_isaS", "config_isaU", "enable_so_checkbox"], values: ["so_stack_pointer_value", "bus_frequency_range"]};
+    "config_isaM", "config_isaS", "config_isaU", "enable_so_checkbox"], values: ["so_stack_pointer_value", "bus_frequency_range", "int_freq_range"]};
   }
 
   log_current_options(){
@@ -295,7 +296,6 @@ sim_status_ch.onmessage = function (ev) {
         run_button.onclick = function(){run_simulator(false);};
       }
       if(ev.data.status.starting){
-        load_file();
         config.load_syscalls();
       }
       break;
@@ -304,6 +304,15 @@ sim_status_ch.onmessage = function (ev) {
       if(ev.data.desc){
         add_syscall_to_table(ev.data.number, ev.data.desc, ev.data.code);
       }
+      break;
+
+    case "load_file":
+      PNotify.info({
+        title: 'File Loaded',
+        text: 'Name: ' + ev.data.name + '\n (' + ev.data.size + ' bytes)',
+        sticker: false,
+        stack: window.stackBottomRight
+      });
       break;
 
     default:
@@ -323,12 +332,6 @@ function load_file(){
     run_button.setAttribute("class", "btn btn-outline-success");
     simulator_controller.load_files(codeSelector.files);
     // run_button.style.background = "";
-    PNotify.info({
-      title: 'File Loaded',
-      text: 'Name: ' + codeSelector.files[0].name + '',
-      sticker: false,
-      stack: window.stackBottomRight
-    });
   }else{
     run_button.setAttribute("class", "btn btn-outline-secondary");
   }
@@ -349,12 +352,12 @@ function get_checked_ISAs(){
 }
 
 function run_simulator(debug) {
-  if(codeSelector.files.length == 0){
-    return;
+  if(!simulator_controller.last_loaded_files){
+    return false;
   }
-  simulator_controller.load_files(codeSelector.files);
+  let filename = simulator_controller.last_loaded_files[0].name;
   var args = [];
-  args.push("/working/" + codeSelector.files[0].name);
+  args.push('/' + filename.replace(" ", "_"));
   if(enable_so_checkbox.checked) {
     args.push("--newlib");
     args.push("--setreg", `sp=${so_stack_pointer_value.value}`);

@@ -9,6 +9,7 @@ export class WebTerminal{
     this.term = $('#xterm-container').terminal(
       {
         whisper: function(...args) {
+          args = args.map((e) => e.trim().replace(" ", "_"));
           simulator_controller.start_execution(args);
         },
         close: function(arg1, arg2) {

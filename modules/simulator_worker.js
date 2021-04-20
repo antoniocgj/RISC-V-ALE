@@ -189,6 +189,7 @@ function initFS() {
     FS.mount(WORKERFS, {
       files: files, // Array of File objects or FileList
     }, '/working');
+    FS.symlink('/working/' + files[0].name, '/' + files[0].name.replace(" ", "_"));
   }
 }
 

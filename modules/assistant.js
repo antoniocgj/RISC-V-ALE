@@ -51,7 +51,6 @@ export class UI_Helper{
 
 export class Assistant_Script{
   constructor(){
-    if(!window.uniq_id) window.uniq_id = performance.now();
     this.stdio_ch = new BroadcastChannel("stdio_channel" + window.uniq_id );
     this.sim_ctrl_ch = new BroadcastChannel("simulator_control" + window.uniq_id );
     this.bus = bus_helper;
@@ -135,7 +134,7 @@ export class Assistant_Script{
   }
 
   async run_simulator(debug) {
-    if(codeSelector.files.length == 0){
+    if(!simulator_controller.last_loaded_files){
       return false;
     }
 
@@ -158,9 +157,9 @@ export class Assistant_Script{
     this.unityLog = "";
     this.unityLastLog = "";
     // start sim
-    simulator_controller.load_files(codeSelector.files);
+    let filename = simulator_controller.last_loaded_files[0].name;
     var args = [];
-    args.push("/working/" + codeSelector.files[0].name);
+    args.push('/' + filename.replace(" ", "_"));
     if(enable_so_checkbox.checked) {
       args.push("--newlib");
       args.push("--setreg", `sp=${so_stack_pointer_value.value}`);
