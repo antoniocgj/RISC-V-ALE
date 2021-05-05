@@ -7,7 +7,6 @@ var simulator_sleep = [1, 1, 1]; // int, read, write
 var simulator_int_inst_delay = 1000;
 
 onmessage = function(e) {
-  console.log(e.data);
   switch(e.data.type){
     case "code_load":
       files = e.data.code;
