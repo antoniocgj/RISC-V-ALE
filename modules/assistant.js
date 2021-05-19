@@ -134,7 +134,7 @@ export class Assistant_Script{
   }
 
   async run_simulator(debug) {
-    if(!simulator_controller.last_loaded_files){
+    if(simulator_controller.last_loaded_files.length == 0){
       return false;
     }
 

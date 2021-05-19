@@ -5,6 +5,7 @@ var interactiveBufferString = "";
 var mem_write_delay = 33;
 var simulator_sleep = [1, 1, 1]; // int, read, write
 var simulator_int_inst_delay = 1000;
+var simulator_read_boost_period = 0.01;
 
 onmessage = function(e) {
   switch(e.data.type){
@@ -101,7 +102,7 @@ class MMIO{
   }
 }
 
-var mmio = new MMIO();
+var mmio = new MMIO(0x10000);
 
 
 class InterruptionController{

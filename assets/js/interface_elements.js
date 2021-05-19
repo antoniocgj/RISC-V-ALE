@@ -331,6 +331,9 @@ function load_file(){
     // label_codeSelector.innerHTML = codeSelector.files;
     run_button.setAttribute("class", "btn btn-outline-success");
     simulator_controller.load_files(codeSelector.files);
+    setTimeout(function(){
+      codeSelector.value = null;
+    }, 100);
     // run_button.style.background = "";
   }else{
     run_button.setAttribute("class", "btn btn-outline-secondary");
@@ -352,7 +355,7 @@ function get_checked_ISAs(){
 }
 
 function run_simulator(debug) {
-  if(!simulator_controller.last_loaded_files){
+  if(simulator_controller.last_loaded_files.length == 0){
     return false;
   }
   let filename = simulator_controller.last_loaded_files[0].name;

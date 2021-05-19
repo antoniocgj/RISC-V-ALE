@@ -32,7 +32,7 @@ class SimulatorController{
     this.bus_ch = new BroadcastChannel('bus_channel' + window.uniq_id);
     this.bus_freq_limit = 30;
     this.int_cont_freq_scale = 0;
-    this.last_loaded_files = undefined
+    this.last_loaded_files = []
     this.startSimulator();
     this.stdio_ch.onmessage = function (e) {
       if(e.data.fh==0){ // stdin
@@ -77,7 +77,7 @@ class SimulatorController{
     }.bind(this);
     this.set_freq_limit(this.bus_freq_limit);
     this.set_int_freq_scale_limit(this.int_cont_freq_scale);
-    if(this.last_loaded_files){
+    if(this.last_loaded_files.length > 0){
       this.load_files(this.last_loaded_files);
     }
   }
@@ -99,9 +99,11 @@ class SimulatorController{
   }
 
   load_files(files){
-    this.simulator.postMessage({type: "add_files", files});
-    this.last_loaded_files = files;
-    this.sim_status_ch.postMessage({type: "load_file", name: files[0].name, size: files[0].size});
+    for (let i = 0; i < files.length; i++) {
+      this.last_loaded_files[i] = files[i];
+    }
+    this.simulator.postMessage({type: "add_files", files: this.last_loaded_files});
+    this.sim_status_ch.postMessage({type: "load_file", name: this.last_loaded_files[0].name, size: this.last_loaded_files[0].size});
   }
 
   set_int_freq_scale_limit(value){
