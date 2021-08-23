@@ -271,7 +271,7 @@ sim_status_ch.onmessage = function (ev) {
   }
   switch (ev.data.type) {
     case "sim_log":
-      settings_tab_simulator_log.insertAdjacentHTML('beforeend', ev.data.log.msg + "<br>");
+      settings_tab_simulator_log.insertAdjacentHTML('beforeend', ev.data.msg + "<br>");
       break;
 
     case "status":

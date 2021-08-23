@@ -1,6 +1,7 @@
 /*jshint esversion: 6 */
 
 var stdinBufferString = "";
+var non_blocking_io = false;
 var interactiveBufferString = "";
 var mem_write_delay = 33;
 var simulator_sleep = [1, 1, 1]; // int, read, write
@@ -18,6 +19,9 @@ onmessage = function(e) {
     case "stdin":
       stdinBufferString += e.data.stdin;
       console.log(stdinBufferString);
+      break;
+    case "non_blocking_io":
+      non_blocking_io = e.data.value;
       break;
     case "mmio":
       mmio.update_store(e.data.addr, e.data.size, e.data.value);
@@ -81,7 +85,7 @@ class MMIO{
   load(addr, size){
     addr &= 0xFFFF;
     if(addr > this.size){
-      postMessage({type: "output", subtype: "error", msg: "MMIO Access Error"});
+      postMessage({type: "sim_log", subtype: "error", msg: "MMIO Access Error"});
     }
 
     return this.memory[size][(addr/size) | 0];
@@ -90,7 +94,7 @@ class MMIO{
   store(addr, size, value){
     addr &= 0xFFFF;
     if(addr > this.size){
-      postMessage({type: "output", subtype: "error", msg: "MMIO Access Error"});
+      postMessage({type: "sim_log", subtype: "error", msg: "MMIO Access Error"});
     }
     postMessage({type: "mmio_write", addr: (addr >>> 0), size, value});
     this.memory[size][(addr/size) | 0] = value;
@@ -163,17 +167,22 @@ var intController = new InterruptionController();
 
 
 function getStdin (count){
-  if(stdinBufferString.length == 0){
+  if(stdinBufferString.length == 0 && !non_blocking_io){
+    wait_for_input_alert();
     return -1;
   }
   var uint8array = new TextEncoder("utf-8").encode(stdinBufferString);
-  if(uint8array.length >= count){
-    return (new TextDecoder().decode(uint8array.slice(0, count)));
+  var res = (new TextDecoder().decode(uint8array.slice(0, count)));
+  stdinBufferString = (new TextDecoder().decode(uint8array.slice(count)));
+  return res;
+}
+
+var last_wait_for_input_alert_sent = 0;
+function wait_for_input_alert(){
+  if(performance.now() - last_wait_for_input_alert_sent > 5000){
+    postMessage({type: "sim_log", subtype: "info", msg: "Waiting for Input..."});
+    last_wait_for_input_alert_sent = performance.now();
   }
-  if(uint8array.includes(0)){
-    return (new TextDecoder().decode(uint8array));
-  }
-  return -1;
 }
 
 function getInteractiveCommand (){
@@ -205,7 +214,7 @@ function getDebugMsg(){
       }
     }catch(e){
       if(postGDBWaiting){
-        postMessage({type: "output", subtype: "info", msg: "Waiting for GDB..."});
+        postMessage({type: "sim_log", subtype: "info", msg: "Waiting for GDB..."});
         postGDBWaiting = 0;
       }
     }
@@ -224,7 +233,7 @@ function sendDebugMsg(msg){
       }
     } catch (error) {
       if(postGDBWaiting){
-        postMessage({type: "output", subtype: "info", msg: "Waiting for GDB..."});
+        postMessage({type: "sim_log", subtype: "info", msg: "Waiting for GDB..."});
         postGDBWaiting = 0;
       }
     }

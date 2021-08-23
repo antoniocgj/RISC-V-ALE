@@ -57,8 +57,8 @@ class SimulatorController{
           // TODO throttle message frequency
           this.stdio_ch.postMessage({fh:e.data.stdioNumber,data:e.data.msg});
           break;
-        case "output":
-          // TODO
+        case "sim_log":
+          this.sim_status_ch.postMessage(e.data);
           break;
         case "mmio_write":
           mmio.update_store(e.data.addr, e.data.size, e.data.value);
