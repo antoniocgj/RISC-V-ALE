@@ -28,8 +28,8 @@ class Calculator extends Assistant_Script{
 
     // add simple equality test for the subtraction and multiplication
     const a = this.randint(0, 1000), b = this.randint(0,1000);
-    this.ui.add_test("Subtraction", this.simple_equality_test(`${a} - ${b}\n\0`, a-b));
-    this.ui.add_test("Multiplication", this.simple_equality_test(`${a} * ${b}\n\0`, a*b));
+    this.ui.add_test("Subtraction", this.simple_equality_test(`${a} - ${b}\n\0`, `${a-b}\n`));
+    this.ui.add_test("Multiplication", this.simple_equality_test(`${a} * ${b}\n\0`, `${a*b}\n`));
   }
 
   randint(min, max) {

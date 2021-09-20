@@ -1,4 +1,6 @@
 import { simulator_controller } from "./simulator.js";
+import {compiler} from "./compiler.js";
+
 
 export class WebTerminal{
   constructor(container, badge){
@@ -11,6 +13,21 @@ export class WebTerminal{
         whisper: function(...args) {
           args = args.map((e) => e.trim().replace(" ", "_"));
           simulator_controller.start_execution(args);
+        },
+        cc: function(...args){
+          compiler.cc(args);
+        },
+        as: function(...args){
+          compiler.as(args);
+        },
+        ld: function(...args){
+          compiler.ld(args);
+        },
+        ls: function () {
+          for (let index = 0; index < simulator_controller.last_loaded_files.length; index++) {
+            const element = simulator_controller.last_loaded_files[index];
+            this.echo(element.name);
+          }
         },
         close: function(arg1, arg2) {
         }
@@ -42,11 +59,20 @@ export class WebTerminal{
         }
       }else if(e.data.type == "sim_log"){
         this.term.echo("[[;yellow;] (LOG) " + e.data.msg + "]");
+      }else if(e.data.type == "clang_status"){
+        if(e.data.status.starting){
+          this.term.echo("$ " + e.data.status.tool + " " + e.data.status.args.join(" "));
+          this.enter_wait_mode();
+        }else{
+          this.term.pop();
+        }
       }
     }.bind(this);
 
     this.stdio_ch.onmessage = function(e) {
-      if(e.data.fh==1){
+      if(e.data.origin == "clang"){
+        this.term.echo(e.data.data);
+      }else if(e.data.fh==1){
         this.term.echo(e.data.data);
       }else if(e.data.fh==2){
         this.term.echo(`[[;darkred;]${e.data.data}]`)
@@ -56,6 +82,39 @@ export class WebTerminal{
     }.bind(this);
   }
 
+  enter_wait_mode(){
+    this.term.push(function (stdin) {
+      
+    },
+    {
+      prompt: '',
+      history: false,
+      keymap: {
+        'CTRL+C': function(e, original) {
+          
+          original();
+        }, 
+        'CTRL+D': function(e, original) {
+          
+        }
+      }
+    }
+    );
+  }
+
+  // async call_clang(op, args){
+  //   this.enter_wait_mode();
+  //   let file = await compiler[op](args);
+  //   if(file){
+  //     console.log(file);
+  //     compiler.load_new_file(file);
+  //     simulator_controller.load_new_file(file);
+  //     this.term.pop();
+  //     return true
+  //   }
+  //   this.term.pop();
+  //   return false
+  // }
 
   enter_input_mode(){
     this.term.push(function (stdin) {

@@ -2,33 +2,60 @@
 
 import {bus_helper} from "../extensions/devices/utils.js";
 import { simulator_controller } from "./simulator.js";
+import {compiler} from "./compiler.js";
+import {conn} from "../../modules/connection.js";
 
 
 export class UI_Helper{
   constructor(intro){
-    this.tests = []
+    this.tests = [];
+    this.test_results = [];
     this.item_log = ""
     document.getElementById("assistant_intro").innerHTML = intro;
     document.getElementById("assistant_run_button").onclick = this.runTests.bind(this);
     this.sleep = (milliseconds) => {
       return new Promise(resolve => setTimeout(resolve, milliseconds));
     };
+    this.final_result = (_ => "");
+    document.getElementById("assistant_test_list").insertAdjacentHTML("afterend", `
+      <p id="assistant_final_result"></p>
+    `)
   }
 
-  add_test(desc, f){
+  add_test(desc, f, {fail_early=false} = {}){
     const itemID = this.tests.length;
     document.getElementById("assistant_test_list").insertAdjacentHTML("beforeend", `
     <li>${desc} <span id=assistant_item_${itemID}></span></li>
     `)
+    f.fail_early = fail_early;
     this.tests.push(f);
   }
 
+  async set_final_result(){
+    document.getElementById("assistant_final_result").innerHTML = await this.final_result();
+  }
+
+  reset_interface(){
+    document.getElementById("assistant_final_result").innerHTML = "";
+    for (const t in this.tests) {
+      const html_item = document.getElementById(`assistant_item_${t}`);
+      html_item.setAttribute("class", "");
+      html_item.setAttribute("onclick", ``);
+      html_item.style.color = "";
+      html_item.innerHTML = "";
+    }
+  }
+
   async runTests(){
+    this.reset_interface();
+    this.test_results = [];
     for (const t in this.tests) {
       const html_item = document.getElementById(`assistant_item_${t}`);
       this.item_log = "";
       html_item.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running ...`;
-      if(await this.tests[t]()){
+      let result = await this.tests[t]();
+      this.test_results.push(result);
+      if(result){
         html_item.setAttribute("class", "pointer");
         html_item.setAttribute("onclick", `alert(unescape("${escape(this.item_log)}"))`);
         html_item.style.color = "darkgreen";
@@ -39,9 +66,14 @@ export class UI_Helper{
         html_item.style["font-weight"] = "bold";
         html_item.setAttribute("onclick", `alert(unescape("${escape(this.item_log)}"))`);
         html_item.innerHTML = "Failed";
+        if(this.tests[t].fail_early){
+          await this.set_final_result();
+          return;
+        }
       }
       await this.sleep(1000);
     }
+    await this.set_final_result();
   }
 
   log(msg){
@@ -55,6 +87,9 @@ export class Assistant_Script{
     this.sim_ctrl_ch = new BroadcastChannel("simulator_control" + window.uniq_id );
     this.bus = bus_helper;
     this.stdioCallback = undefined;
+    this.predefined_args = [];
+    this.connections = [];
+
     this.stdio_ch.onmessage = function(e) {
       if(this.stdioCallback) this.stdioCallback();
       if(e.data.fh==1){
@@ -113,24 +148,44 @@ export class Assistant_Script{
 
   }
 
-  simple_equality_test(stdin, expected_output, timeout=5000){
+  generic_compile_test(){
+    return async function () {
+      this.default_filename = await this.compile_code();
+      this.ui.log(this.stdoutBuffer); 
+      this.ui.log(this.stderrBuffer); 
+      this.log_output();
+      this.log_input_files();
+      if(this.default_filename) return true;
+      return false;
+    }.bind(this)
+  }
+
+  simple_equality_test(stdin, expected_output, {timeout=5000, compare_function=((x,y) => x == y)} = {}){
     return async function () {
       this.set_init_STDIN(stdin);
       if(!(await this.run_simulator())){
         this.ui.log("No file selected");
+        this.log("No file selected");
         return false;
       }
+      expected_output = `${expected_output}`;
       await this.wait_for_output({size:expected_output.length, timeout});
       console.log(this.stdoutBuffer);
-      const result = this.stdoutBuffer.trim();
+      const result = this.stdoutBuffer;
       this.ui.log(`Input: ${stdin.slice(0,-2)} Expected: ${expected_output} Result: ${result}`);
+      this.log(`Input: ${stdin.slice(0,-2)} Expected: ${expected_output} Result: ${result}`);
       this.stop_simulator();
-      if(result == `${expected_output}`){
+      this.log_output();
+      if(compare_function(result, `${expected_output}`)){
         return true;
       }else{
         return false;
       }
     }.bind(this);
+  }
+
+  async compile_code({c_ext = ".c", asm_ext = ".s", obj_ext = ".o", elf_ext = ".x"} = {}){
+    return await compiler.auto_compile(c_ext, asm_ext, obj_ext, elf_ext);
   }
 
   async run_simulator(debug) {
@@ -157,17 +212,35 @@ export class Assistant_Script{
     this.unityLog = "";
     this.unityLastLog = "";
     // start sim
-    let filename = simulator_controller.last_loaded_files[0].name;
+    // elf filename
+    var filename = this.default_filename;
+    if(!filename){
+      for (let index = 0; index < simulator_controller.last_loaded_files.length; index++) {
+        const element = simulator_controller.last_loaded_files[index];
+        if(element.name.endsWith(document.getElementById("elf_ext").value)) {
+          filename = element.name;
+          break;
+        }
+      }
+    }
+    if(!filename) filename = simulator_controller.last_loaded_files[0].name;
+    
+    // args
     var args = [];
     args.push('/' + filename.replace(" ", "_"));
-    if(enable_so_checkbox.checked) {
-      args.push("--newlib");
-      args.push("--setreg", `sp=${so_stack_pointer_value.value}`);
+    if(this.predefined_args.length > 0){
+      args.push(...this.predefined_args);
+    }else{
+      if(enable_so_checkbox.checked) {
+        args.push("--newlib");
+        args.push("--setreg", `sp=${so_stack_pointer_value.value}`);
+      }
+      if(debug) args.push("--interactive");
+      args.push("--isa", get_checked_ISAs());
     }
-    if(debug) args.push("--interactive");
-    args.push("--isa", get_checked_ISAs());
+
     simulator_controller.start_execution(args);
-    this.wait_for_output({msg: "Calling stub instead of sigaction", fh:2});
+    await this.sleep(1000);
     return true;
   }
 
@@ -182,7 +255,35 @@ export class Assistant_Script{
   set_init_STDIN(value){
     this.stdio_ch.postMessage({fh:-1, init_stdin:true, data:value});
   }
-  
+
+  log(msg){
+    this.connections.map(function (cn) {
+      cn.send({id: this.id, type: "msg", msg});
+    }.bind(this));
+  }
+
+  log_output(){
+    this.connections.map(function (cn) {
+      cn.send({id: this.id, type: "msg", msg: "STDOUT:\n" + this.stdoutBuffer});
+      cn.send({id: this.id, type: "msg", msg: "STDERR:\n" + this.stderrBuffer});
+      if(this.unityLog) cn.send({id: this.id, type: "msg", msg: "unityLog:\n" + this.unityLog});
+    }.bind(this));
+  }
+
+  log_input_files(){
+    if(this.connections.length == 0) return;
+    for (let index = 0; index < simulator_controller.last_loaded_files.length; index++) {
+      const element = simulator_controller.last_loaded_files[index];
+      const reader = new FileReader();
+      reader.onload = (event => {
+        this.connections.map(function (cn) {
+          cn.send({id: this.id, type: "file", name: element.name});
+          cn.send(event.target.result);
+        }.bind(this));
+      });
+      reader.readAsArrayBuffer(element);
+    }
+  }
 }
 
 export class Assistant{

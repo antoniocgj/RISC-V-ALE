@@ -78,11 +78,12 @@ class SimulatorController{
     this.set_freq_limit(this.bus_freq_limit);
     this.set_int_freq_scale_limit(this.int_cont_freq_scale);
     if(this.last_loaded_files.length > 0){
-      this.load_files(this.last_loaded_files);
+      
     }
   }
 
   start_execution(args){
+    this.simulator.postMessage({type: "add_files", files: this.last_loaded_files});
     this.sim_status_ch.postMessage({type: "status", status:{starting_exec: true, args}});
     this.simulator.postMessage({type: "start", args});
   }
@@ -99,11 +100,21 @@ class SimulatorController{
   }
 
   load_files(files){
+    this.last_loaded_files = [];
     for (let i = 0; i < files.length; i++) {
       this.last_loaded_files[i] = files[i];
     }
-    this.simulator.postMessage({type: "add_files", files: this.last_loaded_files});
     this.sim_status_ch.postMessage({type: "load_file", name: this.last_loaded_files[0].name, size: this.last_loaded_files[0].size});
+  }
+
+  load_new_file(file){
+    for (let index = 0; index < this.last_loaded_files.length; index++) {
+      if(this.last_loaded_files[index].name == file.name){
+        this.last_loaded_files[index] = file;
+        return;
+      }
+    }
+    this.last_loaded_files.push(file);
   }
 
   set_int_freq_scale_limit(value){

@@ -251,21 +251,24 @@
                         <div class="col">
                             <form>
                                 <fieldset>
-                                    <legend>Activity Creator</legend>
+                                    <legend>Configuration Export</legend>
                                 </fieldset>
                             </form>
-                            <div class="form-group"><label>Description URL:&nbsp;</label><input class="d-inline" type="text" id="conf_export_desc_url"></div>
+                            <div class="form-group"><label>Home URL:&nbsp;</label><input class="d-inline" type="text" id="conf_export_desc_url"></div>
                             <div class="form-group"><label>Assistant Script:&nbsp;</label><input class="d-inline" type="file" id="conf_export_assistant_script"></div>
-                            <div class="btn-group float-right justify-content-xl-end" role="group"><button class="btn btn-primary" id="settings_tab_conf_generate" type="button">generate LINK</button><button class="btn btn-primary" id="settings_tab_conf_export" type="button">Export</button></div><textarea class="d-block" id="settings_tab_conf_export_desc" style="width: 100%;height: 40vh;" readonly=""></textarea>
+                            <div class="btn-group float-right justify-content-xl-end" role="group"><button class="btn btn-primary" id="settings_tab_conf_generate" type="button">generate LINK</button><button class="btn btn-primary" id="settings_tab_conf_export" type="button">copy to clipboard</button></div><textarea class="d-block" id="settings_tab_conf_export_desc" style="width: 100%;height: 40vh;" readonly=""></textarea>
                         </div>
                         <div class="col">
                             <div class="row">
-                                <div class="col">
-                                    <form>
-                                        <fieldset>
-                                            <legend>Simulator Log</legend>
-                                        </fieldset><textarea class="form-control d-block" id="settings_tab_simulator_log" style="width: 100%;height: 40vh;"></textarea>
-                                    </form>
+                                <div class="col text-justify">
+                                    <fieldset>
+                                        <legend>Auto-compile options</legend>
+                                    </fieldset>
+                                    <div class="form-group text-truncate"><label>C code extension:&nbsp;</label><input class="d-inline" type="text" id="c_ext" value=".c"></div>
+                                    <div class="form-group"><label>Asm code extension:&nbsp;</label><input class="d-inline" type="text" id="asm_ext" value=".s"></div>
+                                    <div class="form-group"><label>Object file extension:&nbsp;</label><input class="d-inline" type="text" id="obj_ext" value=".o"></div>
+                                    <div class="form-group"><label>ELF extension:&nbsp;</label><input class="d-inline" type="text" id="elf_ext" value=".x"></div>
+                                    <div class="custom-control text-center custom-switch"><input class="custom-control-input" type="checkbox" id="auto_compile" checked=""><label class="custom-control-label" for="formCheck-1">Enable Auto-Compile</label></div>
                                 </div>
                             </div>
                         </div>

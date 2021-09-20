@@ -81,6 +81,7 @@ import {MMIO_Manager} from "../../modules/mmio_manager.js";
 import {WebTerminal} from "../../modules/terminal.js";
 import {Assistant} from "../../modules/assistant.js";
 import {simulator_controller} from "../../modules/simulator.js";
+import {compiler} from "../../modules/compiler.js";
 import {conn} from "../../modules/connection.js";
 
 var mmio_manager = new MMIO_Manager();
@@ -271,7 +272,7 @@ sim_status_ch.onmessage = function (ev) {
   }
   switch (ev.data.type) {
     case "sim_log":
-      settings_tab_simulator_log.insertAdjacentHTML('beforeend', ev.data.msg + "<br>");
+      // settings_tab_simulator_log.insertAdjacentHTML('beforeend', ev.data.msg + "<br>");
       break;
 
     case "status":
@@ -306,6 +307,18 @@ sim_status_ch.onmessage = function (ev) {
       }
       break;
 
+    case "clang_status":
+      if(ev.data.status.starting){
+        if(!($("#modal_terminal").data('bs.modal') || {})._isShown){
+          $('#modal_terminal').modal({backdrop: false,show: true});
+          $('#modal_terminal').draggable({handle: ".modal-header"});
+          web_terminal.openTerminal();
+        }
+      }else{
+        run_button.onclick = function(){run_simulator(false);};
+      }
+      break;
+
     case "load_file":
       PNotify.info({
         title: 'File Loaded',
@@ -331,6 +344,7 @@ function load_file(){
     // label_codeSelector.innerHTML = codeSelector.files;
     run_button.setAttribute("class", "btn btn-outline-success");
     simulator_controller.load_files(codeSelector.files);
+    compiler.set_file_array(simulator_controller.last_loaded_files);
     setTimeout(function(){
       codeSelector.value = null;
     }, 100);
@@ -354,11 +368,33 @@ function get_checked_ISAs(){
   return ISAs;
 }
 
-function run_simulator(debug) {
+async function auto_compile() {
+  if(!document.getElementById("auto_compile").checked) return -1;
+  return await compiler.auto_compile(document.getElementById("c_ext").value, document.getElementById("asm_ext").value, document.getElementById("obj_ext").value, document.getElementById("elf_ext").value);
+}
+
+async function run_simulator(debug) {
   if(simulator_controller.last_loaded_files.length == 0){
+    PNotify.notice({
+      title: 'No input files',
+      text: 'Select at least one input file to run or compile',
+      sticker: false,
+      stack: window.stackBottomRight
+    });
     return false;
   }
-  let filename = simulator_controller.last_loaded_files[0].name;
+  run_button.onclick = function () {console.log("Repeated click");};
+  var filename = await auto_compile();
+  if(!filename){
+    for (let index = 0; index < simulator_controller.last_loaded_files.length; index++) {
+      const element = simulator_controller.last_loaded_files[index];
+      if(element.name.endsWith(document.getElementById("elf_ext").value)) {
+        filename = element.name;
+        break;
+      }
+    }
+  }
+  if(!filename) filename = simulator_controller.last_loaded_files[0].name;
   var args = [];
   args.push('/' + filename.replace(" ", "_"));
   if(enable_so_checkbox.checked) {
@@ -537,7 +573,7 @@ os_tab_stdio_download.onclick = function() {
 
 // tab settings_tab_simulator_log
 
-settings_tab_conf_generate.onclick = function (){
+function generate_config_link(){
   config.log_current_options();
   const conf = config.get_config_json();
   if(conf_export_assistant_script.files.length){
@@ -555,8 +591,19 @@ settings_tab_conf_generate.onclick = function (){
   }
 }
 
+settings_tab_conf_generate.onclick = generate_config_link;
+
 settings_tab_conf_export.onclick = function () {
-  download("config.json", settings_tab_conf_export_desc.value);
+  generate_config_link();
+  navigator.clipboard.writeText(settings_tab_conf_export_desc.value).then(function() {
+    PNotify.info({
+      title: 'Link copied to clipboard',
+      sticker: false,
+      stack: window.stackBottomRight
+    });
+  }, function(err) {
+    console.error('Could not copy text: ', err);
+  });
 }
 
 navegation.locationHashChanged();

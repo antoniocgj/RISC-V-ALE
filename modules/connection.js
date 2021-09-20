@@ -1,4 +1,5 @@
 import {simulator_controller} from "./simulator.js";
+import {compiler} from "./compiler.js";
 
 class Window_postMessage{
   constructor(isTrusted=false){
@@ -50,6 +51,10 @@ export class Connection{
     this.operations = {"load_file": {desc: "Load file", f: this.load_file_from_base64}}
   }
 
+  send(data){
+
+  }
+
   run_remote_cmd(cmd){
     this.operations[cmd.op].f(cmd.params);
   }
@@ -69,7 +74,47 @@ export class Connection{
     var blob = new Blob([bytes], {type: 'application/binary'});
     let file = new File([blob], params.name);
     simulator_controller.load_files([file]);
+    compiler.set_file_array(simulator_controller.last_loaded_files);
   }
+}
+
+export class LocalReport extends Connection{
+  constructor(){
+    super();
+    this.restart();
+  }
+
+  restart(){
+    this.log = [];
+    this.report = {log:this.log};
+    this.dataLog = [];
+    this.dataLogSizes = []
+  }
+
+  send(data){
+    if(data.constructor.name === "ArrayBuffer"){
+      this.dataLog.push(data)
+      this.dataLogSizes.push(data.byteLength);
+      this.log[this.log.length - 1]["data_log_idx"] = this.dataLog.length - 1;
+    }else{ // TODO: validate data
+      this.log.push(data);
+    }
+  }
+
+  hashLog(){
+
+  }
+
+  generate_report(){
+    let header = new Uint32Array(this.dataLogSizes.length + 2);
+    header[0] = this.dataLogSizes.length + 2;
+    let reportJson = new TextEncoder("utf-8").encode(JSON.stringify(this.report));
+    header[1] = reportJson.byteLength;
+    header.set(this.dataLogSizes, 2);
+    let blob = new Blob([header, reportJson, this.dataLog].flat(), {type: "application/octet-stream"});
+    return blob;
+  }
+
 }
 
 export const conn = new Connection();

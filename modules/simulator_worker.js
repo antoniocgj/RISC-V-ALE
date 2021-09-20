@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 
-var stdinBufferString = "";
+var stdinBuffer = new Uint8Array([]);
 var non_blocking_io = false;
 var interactiveBufferString = "";
 var mem_write_delay = 33;
@@ -17,8 +17,12 @@ onmessage = function(e) {
       importScripts("whisper.js");
       break;
     case "stdin":
-      stdinBufferString += e.data.stdin;
-      console.log(stdinBufferString);
+      let new_stdin = new TextEncoder("utf-8").encode(e.data.stdin);
+      let new_stdin_buffer = new Uint8Array(new_stdin.length + stdinBuffer.length);
+      new_stdin_buffer.set(stdinBuffer)
+      new_stdin_buffer.set(new_stdin, stdinBuffer.length)
+      stdinBuffer = new_stdin_buffer;
+      console.log(stdinBuffer);
       break;
     case "non_blocking_io":
       non_blocking_io = e.data.value;
@@ -167,13 +171,12 @@ var intController = new InterruptionController();
 
 
 function getStdin (count){
-  if(stdinBufferString.length == 0 && !non_blocking_io){
+  if(stdinBuffer.length == 0 && !non_blocking_io){
     wait_for_input_alert();
     return -1;
   }
-  var uint8array = new TextEncoder("utf-8").encode(stdinBufferString);
-  var res = (new TextDecoder().decode(uint8array.slice(0, count)));
-  stdinBufferString = (new TextDecoder().decode(uint8array.slice(count)));
+  var res = stdinBuffer.slice(0, count);
+  stdinBuffer = stdinBuffer.slice(count);
   return res;
 }
 
@@ -192,13 +195,16 @@ function getInteractiveCommand (){
 }
 
 function initFS() {
+  console.log(files);
   FS.init(null, null, null);
   FS.mkdir('/working');
   if(files){
     FS.mount(WORKERFS, {
       files: files, // Array of File objects or FileList
     }, '/working');
-    FS.symlink('/working/' + files[0].name, '/' + files[0].name.replace(" ", "_"));
+    for (let index = 0; index < files.length; index++) {
+      FS.symlink('/working/' + files[index].name, '/' + files[index].name.replace(" ", "_"));
+    }
   }
 }
 
