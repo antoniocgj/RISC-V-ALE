@@ -3,7 +3,6 @@
 import {bus_helper} from "../extensions/devices/utils.js";
 import { simulator_controller } from "./simulator.js";
 import {compiler} from "./compiler.js";
-import {conn} from "../../modules/connection.js";
 
 
 export class UI_Helper{
