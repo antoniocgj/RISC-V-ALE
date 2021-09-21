@@ -1,17 +1,87 @@
 import {simulator_controller} from "./simulator.js";
 import {compiler} from "./compiler.js";
 
-class Window_postMessage{
+export class Connection{
+  constructor(){
+    this.operations = {"load_file": {desc: "Load file", f: this.load_file_from_base64.bind(this)},
+                       "load_files_from_array": {desc: "Load files from array", f: this.load_files_from_array.bind(this)},
+                       "load_add_file": {desc: "Load Add. file", f: this.load_add_file_from_base64.bind(this)},
+                       "echo": {desc: "Echo", f: this.echo.bind(this)},
+                       "start_assistant": {desc: "Start Assistant Script", f: this.start_assistant.bind(this)}}
+
+  }
+
+  send(data){
+
+  }
+
+  run_remote_cmd(cmd){
+    this.operations[cmd.op].f(cmd.params);
+  }
+
+
+
+  load_add_file_from_base64(params){
+    var base64ToArrayBuffer = function (base64) {
+      var binaryString = window.atob(base64);
+      var binaryLen = binaryString.length;
+      var bytes = new Uint8Array(binaryLen);
+      for (var i = 0; i < binaryLen; i++) {
+         var ascii = binaryString.charCodeAt(i);
+         bytes[i] = ascii;
+      }
+      return bytes;
+    };
+    var bytes = base64ToArrayBuffer(params.str64);
+    var blob = new Blob([bytes], {type: 'application/binary'});
+    let file = new File([blob], params.name);
+    simulator_controller.load_new_file(file);
+  }
+
+  load_files_from_array(files){
+    simulator_controller.load_files(files);
+    compiler.set_file_array(simulator_controller.last_loaded_files);
+  }
+
+  load_file_from_base64(params){
+    var base64ToArrayBuffer = function (base64) {
+      var binaryString = window.atob(base64);
+      var binaryLen = binaryString.length;
+      var bytes = new Uint8Array(binaryLen);
+      for (var i = 0; i < binaryLen; i++) {
+         var ascii = binaryString.charCodeAt(i);
+         bytes[i] = ascii;
+      }
+      return bytes;
+    };
+    var bytes = base64ToArrayBuffer(params.str64);
+    var blob = new Blob([bytes], {type: 'application/binary'});
+    let file = new File([blob], params.name);
+    simulator_controller.load_files([file]);
+    compiler.set_file_array(simulator_controller.last_loaded_files);
+  }
+
+  start_assistant(){
+    document.getElementById("assistant_run_button").click();
+  }
+
+  echo(data){
+    this.send(data);
+  }
+}
+
+class Window_postMessage extends Connection{
   constructor(isTrusted=false){
+    super();
     this.isTrusted = isTrusted;
     window.onmessage = this.msg_handle.bind(this);
   }
 
   msg_handle(msg){
-    if(this.isTrusted){ 
-      conn.run_remote_cmd(msg.data.cmd); 
+    if(this.isTrusted || window.origin == msg.origin){ 
+      this.run_remote_cmd(msg.data.cmd); 
     }else{
-      var operation = conn.operations[msg.data.cmd.op];
+      var operation = this.operations[msg.data.cmd.op];
       if(operation) operation = operation.desc;
       this.confirmation_dialog(msg.data.name, msg.origin, operation, msg.data.cmd);
     }
@@ -39,42 +109,16 @@ class Window_postMessage{
         }]
       ])
     });
-    notice.on('pnotify:confirm', () => conn.run_remote_cmd(cmd));
+    notice.on('pnotify:confirm', () => this.run_remote_cmd(cmd));
     notice.on('pnotify:cancel', () => "");
-  }
-}
-
-
-export class Connection{
-  constructor(){
-    this.wpm = new Window_postMessage();
-    this.operations = {"load_file": {desc: "Load file", f: this.load_file_from_base64}}
   }
 
   send(data){
-
-  }
-
-  run_remote_cmd(cmd){
-    this.operations[cmd.op].f(cmd.params);
-  }
-
-  load_file_from_base64(params){
-    var base64ToArrayBuffer = function (base64) {
-      var binaryString = window.atob(base64);
-      var binaryLen = binaryString.length;
-      var bytes = new Uint8Array(binaryLen);
-      for (var i = 0; i < binaryLen; i++) {
-         var ascii = binaryString.charCodeAt(i);
-         bytes[i] = ascii;
-      }
-      return bytes;
-    };
-    var bytes = base64ToArrayBuffer(params.str64);
-    var blob = new Blob([bytes], {type: 'application/binary'});
-    let file = new File([blob], params.name);
-    simulator_controller.load_files([file]);
-    compiler.set_file_array(simulator_controller.last_loaded_files);
+    if(data.constructor.name === "ArrayBuffer"){
+      // TODO?
+    }else{ // TODO: validate data
+      window.parent.postMessage(data);
+    }
   }
 }
 
@@ -118,3 +162,4 @@ export class LocalReport extends Connection{
 }
 
 export const conn = new Connection();
+export const win_postmessage = new Window_postMessage();

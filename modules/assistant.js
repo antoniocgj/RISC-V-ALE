@@ -90,12 +90,12 @@ export class Assistant_Script{
     this.connections = [];
 
     this.stdio_ch.onmessage = function(e) {
-      if(this.stdioCallback) this.stdioCallback();
       if(e.data.fh==1){
         this.stdoutBuffer += e.data.data+"\n";
       }else if(e.data.fh==2){
         this.stderrBuffer += e.data.data+"\n";
       }
+      if(this.stdioCallback) this.stdioCallback();
     }.bind(this);
 
     this.sleep = (milliseconds) => {

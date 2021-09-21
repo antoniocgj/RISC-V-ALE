@@ -48,7 +48,7 @@ function initFS() {
       files: files, // Array of File objects or FileList
     }, '/working');
     for (let index = 0; index < files.length; index++) {
-      FS.symlink('/working/' + files[index].name, '/' + files[index].name.replace(" ", "_"));
+      if(files[index].name != expected_result) FS.symlink('/working/' + files[index].name, '/' + files[index].name.replace(" ", "_"));
     }
   }
 }
