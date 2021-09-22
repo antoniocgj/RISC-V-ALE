@@ -175,11 +175,7 @@ export class Assistant_Script{
       this.log(`Input: ${stdin.slice(0,-2)} Expected: ${expected_output} Result: ${result}`);
       this.stop_simulator();
       this.log_output();
-      if(compare_function(result, `${expected_output}`)){
-        return true;
-      }else{
-        return false;
-      }
+      return compare_function(result, `${expected_output}`);
     }.bind(this);
   }
 

@@ -60,13 +60,12 @@
                 <ul class="navbar-nav float-right flex-nowrap ml-auto">
                     <li class="nav-item dropdown no-arrow mx-1"><input class="d-none" type="file" id="codeSelector" multiple=""><button class="btn btn-warning" data-toggle="tooltip" data-bss-tooltip="" data-placement="bottom" id="terminal_button" type="button" title="Terminal" style="height: 49px;width: 63px;"><i class="fas fa-terminal"></i><span class="badge badge-pill badge-danger" id="terminal_badge" hidden="true">.</span></button><button class="btn btn-info" data-toggle="tooltip" data-bss-tooltip="" data-placement="bottom" id="file_select_button" type="button" title="Load File" style="height: 49px;width: 63px;"><i class="fas fa-file-upload"></i></button>
                         <div class="btn-group" id="run_button_group" style="height: 49px;"><button class="btn btn-primary" id="run_button" type="button" style="background: #ffffff;color: #041e42;">&nbsp;RUN</button><button class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false" id="run_options_selector" type="button" style="background: #ffffff;color: #041e42;"></button>
-                            <div class="dropdown-menu"><a class="dropdown-item pointer" id="run_with_debug_button" style="color: #041e42;"><i class="fas fa-bug"></i>&nbsp;Debug</a></div>
+                            <div class="dropdown-menu"><a class="dropdown-item pointer" id="run_with_debug_button" style="color: #041e42;"><i class="fas fa-bug"></i>&nbsp;Debug</a><a class="dropdown-item pointer" id="assistant_button" style="color: #041e42;"><i class="fas fa-hands-helping"></i>&nbsp;Assistant</a></div>
                         </div>
                     </li>
                 </ul>
             </div>
         </nav>
-        <div class="d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center" id="sidebar-wrapper1" style="border-color: #ffc72c;"><button class="btn btn-primary d-flex d-lg-flex d-xl-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center" data-bss-hover-animate="rubberBand" id="assistant_button" type="button" style="width: 16;height: 27px;padding-right: 0px;padding-left: 0;"><i class="far fa-eye justify-content-xl-start" style="margin-right: auto;margin-left: auto;"></i></button></div>
         <div class="d-flex flex-column" id="content-wrapper">
             <div class="modal fade" role="dialog" tabindex="-1" id="modal_terminal" data-keyboard="false" data-backdrop="static">
                 <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
