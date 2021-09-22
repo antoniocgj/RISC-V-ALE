@@ -13,6 +13,10 @@
   <input type="text" name="" id="activity_url">
   <button onclick="run_tests();">Run Tests</button>
   <button onclick="get_results();">Get Results</button>
+  <span>Test Timeout: </span>
+  <input type="text" name="" id="test_timeout" value=60000>
+  <span>Load time: </span>
+  <input type="text" name="" id="load_time" value=1000>
   <iframe id="sim_iframe" style="margin:0;width:100%;height:100vh" src="./index.html" frameborder="0" sandbox="allow-modals allow-scripts allow-same-origin" ></iframe>
   <script src="assets/js/z-worker.js"></script>
   <script src="assets/js/zip.min.js"></script>
@@ -53,10 +57,17 @@
       setTimeout(function () {
         sim_iframe.contentWindow.postMessage({cmd: {op: "load_files_from_array", params: [file]}});
         sim_iframe.contentWindow.postMessage({cmd: {op: "start_assistant", params: {}}});
-      }, 3000);
+      }, document.getElementById("load_time").value*3);
       return new Promise(resolve => {
-        finish_test_cb = resolve;
-        setTimeout(resolve, 60000);
+        let tm = setTimeout(_ => { 
+          test_log["comment"] = "Test timeout";
+          test_log["grade"] = 0;
+          resolve();
+        }, document.getElementById("test_timeout").value);
+        finish_test_cb = _ => {
+          clearTimeout(tm);
+          resolve();
+        }
       });
     }
 
@@ -69,9 +80,10 @@
         if(localStorage.getItem(element.name) === ""){
           test_log["filename"] = element.name;
           await run_test(element);
+          await sleep(document.getElementById("load_time").value*2);
           sim_iframe.contentWindow.location.reload();
           localStorage.setItem(element.name, JSON.stringify(test_log));
-          await sleep(3000);
+          await sleep(document.getElementById("load_time").value*3);
         }
       }
     }
