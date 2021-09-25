@@ -171,8 +171,8 @@ export class Assistant_Script{
       await this.wait_for_output({size:expected_output.length, timeout});
       console.log(this.stdoutBuffer);
       const result = this.stdoutBuffer;
-      this.ui.log(`Input: ${stdin.slice(0,-2)} Expected: ${expected_output} Result: ${result}`);
-      this.log(`Input: ${stdin.slice(0,-2)} Expected: ${expected_output} Result: ${result}`);
+      this.ui.log(`Input: ${stdin} Expected: ${expected_output} Result: ${result}`);
+      this.log(`Input: ${stdin} Expected: ${expected_output} Result: ${result}`);
       this.stop_simulator();
       this.log_output();
       return compare_function(result, `${expected_output}`);

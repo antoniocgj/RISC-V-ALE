@@ -1,6 +1,6 @@
 class Compiler{
   constructor(){
-    this.timeout = 5000;
+    this.timeout = 15000;
     this.loaded_files = [];
     this.stdio_ch = new BroadcastChannel("stdio_channel" + window.uniq_id);
     this.sim_status_ch = new BroadcastChannel('simulator_status' + window.uniq_id);

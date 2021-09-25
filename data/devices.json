@@ -19,6 +19,11 @@
       "name": "GPT",
       "desc": "General Purpose Timer",
       "action": "general_purpose_timer.js"
+    },
+    {
+      "name": "Canvas",
+      "desc": "Canvas for drawing and displaying images",
+      "action": "canvas.js"
     }
   ]
 }

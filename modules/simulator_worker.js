@@ -3,7 +3,7 @@
 var stdinBuffer = new Uint8Array([]);
 var non_blocking_io = false;
 var interactiveBufferString = "";
-var mem_write_delay = 33;
+var mem_write_delay = 0;
 var simulator_sleep = [1, 1, 1]; // int, read, write
 var simulator_int_inst_delay = 1000;
 var simulator_read_boost_period = 0.01;
