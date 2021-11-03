@@ -3,10 +3,9 @@
 var stdinBuffer = new Uint8Array([]);
 var non_blocking_io = false;
 var interactiveBufferString = "";
-var mem_write_delay = 0;
+var mem_write_delay = 30;
 var simulator_sleep = [1, 1, 1]; // int, read, write
 var simulator_int_inst_delay = 1000;
-var simulator_read_boost_period = 0.01;
 
 onmessage = function(e) {
   switch(e.data.type){
@@ -27,9 +26,6 @@ onmessage = function(e) {
     case "non_blocking_io":
       non_blocking_io = e.data.value;
       break;
-    case "mmio":
-      mmio.update_store(e.data.addr, e.data.size, e.data.value);
-      break;
     case "interactive":
       interactiveBufferString += e.data.cmd;
       break;
@@ -48,6 +44,11 @@ onmessage = function(e) {
         postMessage({type:"status", status:{running:true}});
       } 
       importScripts("whisper.js");
+      break;
+
+    case 'sync':
+      bus_sync.merge(e.data.buffer);
+      bus_sync.sync();
       break;
 
     case "load_syscall":
@@ -91,7 +92,6 @@ class MMIO{
     if(addr > this.size){
       postMessage({type: "sim_log", subtype: "error", msg: "MMIO Access Error"});
     }
-
     return this.memory[size][(addr/size) | 0];
   }
 
@@ -100,8 +100,8 @@ class MMIO{
     if(addr > this.size){
       postMessage({type: "sim_log", subtype: "error", msg: "MMIO Access Error"});
     }
-    postMessage({type: "mmio_write", addr: (addr >>> 0), size, value});
     this.memory[size][(addr/size) | 0] = value;
+    bus_sync.add_mmio_update(addr, size, value);
   }
 
   update_store(addr, size, value){
@@ -112,6 +112,48 @@ class MMIO{
 
 var mmio = new MMIO(0x10000);
 
+class BusSync{
+  constructor(mmio){
+    this.mmio = mmio;
+    this.stdout_buffer = "";
+    this.stderr_buffer = "";
+    this.mmio_write_buffer = [];
+  }
+
+  add_mmio_update(addr, size, value){
+    for (let i = 0; i < size; i++) {
+      this.mmio_write_buffer[addr + i] = (value >> (i*8)) & 0xFF;
+    }
+  }
+
+  add_stdout(text){
+    this.stdout_buffer += `${text}\n`; 
+  }
+
+  add_stderr(text){
+    this.stderr_buffer += `${text}\n`; 
+  }
+
+  merge(extern_mmio_buffer){
+    for (const i in extern_mmio_buffer) {
+      const value = extern_mmio_buffer[i];
+      if(!(i in this.mmio_write_buffer)){ // processor priority
+        this.mmio.memory[1][i] = value;
+      }
+    }
+  }
+
+  sync(){
+    postMessage({type: "sync", mmio_buffer: this.mmio_write_buffer, stdout: this.stdout_buffer,
+                 stderr: this.stderr_buffer});
+    this.stdout_buffer = "";
+    this.stderr_buffer = "";
+    this.mmio_write_buffer = [];
+  }
+
+}
+
+var bus_sync = new BusSync(mmio);
 
 class InterruptionController{
   constructor(){
@@ -160,7 +202,7 @@ class SyscallEmulator{
       return a0;
     }else{
       var text = "Invalid syscall: " + a7;
-      postMessage({type: "stdio", stdioNumber: 2, msg: text});
+      postMessage({type: "sim_log", subtype: "error", msg: text});
       return 0;
     }
   }
@@ -208,6 +250,10 @@ function initFS() {
   }
 }
 
+function finishExec() {
+  postMessage({type:"status", status:{finish:true}});
+}
+
 var xhr = new XMLHttpRequest();
 function getDebugMsg(){
   postGDBWaiting = 1;
@@ -250,8 +296,8 @@ var Module = {
   // arguments : ["--version"],
   arguments : ["--newlib", "/working/ex2", "--isa", "acdfimsu", "--setreg", "sp=0x10000"],
   preRun : [initFS],
-  print : function (text) {postMessage({type: "stdio", stdioNumber: 1, msg: text});},
-  printErr : function (text) {postMessage({type: "stdio", stdioNumber: 2, msg: text});}
+  print : bus_sync.add_stdout.bind(bus_sync),
+  printErr : bus_sync.add_stderr.bind(bus_sync)
 };
 
-postMessage({type:"status", status:{running:false, starting:true}});
+postMessage({type:"status", status:{starting:true}});

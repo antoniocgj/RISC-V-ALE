@@ -148,7 +148,7 @@ class ConfigurationManager{
   constructor(){
     this.currentConfig = {options:{}, syscalls:{}, devices:{}}
     this.trackedOptions = {checkboxes: ["config_isaA", "config_isaC", "config_isaD", "config_isaF", "config_isaI", 
-    "config_isaM", "config_isaS", "config_isaU", "enable_so_checkbox"], values: ["so_stack_pointer_value", "bus_frequency_range", "int_freq_range"]};
+    "config_isaM", "config_isaS", "config_isaU", "enable_so_checkbox"], values: ["so_stack_pointer_value", "int_freq_range"]};
   }
 
   log_current_options(){
@@ -289,7 +289,7 @@ sim_status_ch.onmessage = function (ev) {
           $('#modal_terminal').draggable({handle: ".modal-header"});
           web_terminal.openTerminal();
         }
-      }else{
+      }else if(ev.data.status.stopping || ev.data.status.finish){
         run_button.innerHTML = 'Run';
         run_button.setAttribute("class", "btn btn-outline-success");
         run_button.style.background = "#FFFFFF";
@@ -452,25 +452,16 @@ fetch('./data/home.json').then(function (request) {
 
 // hardware tab
 
-int_freq_range.onchange = function () {
+function freq_change() {
   let value = int_freq_range.value;
   if(value == 0){
     int_freq_range_indicator.innerHTML = "1/∞";
   }else{
-    int_freq_range_indicator.innerHTML = "1/10<sup>"+ (7 - value) +"</sup>";
+    int_freq_range_indicator.innerHTML = "1/2<sup>"+ (32 - value) +"</sup>";
   }
   simulator_controller.set_int_freq_scale_limit(value);
 }
-
-bus_frequency_range.onchange = function () {
-  let value = bus_frequency_range.value;
-  if(value == 1000){
-    bus_frequency_range_indicator.innerHTML = "unlimited";
-  }else{
-    bus_frequency_range_indicator.innerHTML = value + "Hz";
-  }
-  simulator_controller.set_freq_limit(value);
-}
+int_freq_range.onchange = freq_change;
 
 window.load_device = async function (name, slot){
   if(slot == undefined){
@@ -608,3 +599,4 @@ settings_tab_conf_export.onclick = function () {
 
 navegation.locationHashChanged();
 load_file();
+freq_change();

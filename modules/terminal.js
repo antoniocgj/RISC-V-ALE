@@ -49,7 +49,8 @@ export class WebTerminal{
           }else{
             this.enter_input_mode();
           }
-        }else if(!e.data.status.running && this.running_mode){
+        }
+        if((e.data.status.stopping || e.data.status.finish) && this.running_mode){
           this.term.pop();
           this.running_mode = false;
         }

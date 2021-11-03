@@ -16,7 +16,7 @@ class MMIO{
   store(addr, size, value){
     addr &= 0xFFFF;
     this.memory[size][(addr/size) | 0] = value;
-    simulator_controller.simulator.postMessage({type: "mmio", addr, size, value});
+    simulator_controller.add_mmio_update(addr, size, value);
   }
 
   update_store(addr, size, value){
@@ -31,7 +31,7 @@ class SimulatorController{
     this.sim_status_ch = new BroadcastChannel('simulator_status' + window.uniq_id);
     this.bus_ch = new BroadcastChannel('bus_channel' + window.uniq_id);
     this.bus_freq_limit = 30;
-    this.int_cont_freq_scale = 0;
+    this.int_cont_freq_scale = 25;
     this.last_loaded_files = []
     this.startSimulator();
     this.stdio_ch.onmessage = function (e) {
@@ -53,39 +53,52 @@ class SimulatorController{
     this.simulator = new Worker("./modules/simulator_worker.js");
     this.simulator.onmessage = function(e){
       switch(e.data.type){
-        case "stdio":
-          // TODO throttle message frequency
-          this.stdio_ch.postMessage({fh:e.data.stdioNumber,data:e.data.msg});
-          break;
-        case "sim_log":
-          this.sim_status_ch.postMessage(e.data);
-          break;
-        case "mmio_write":
-          mmio.update_store(e.data.addr, e.data.size, e.data.value);
-          this.bus_ch.postMessage({write:true, addr: e.data.addr, size: e.data.size, value: e.data.value})
-          break;
         case 'device_message':
           this.bus_ch.postMessage({so_emulation:true, syscall: e.data.syscall, data: e.data.message});
           break;
+        case "sim_log":
         case "status":
           this.sim_status_ch.postMessage(e.data);
           break;
-
+        case 'sync':
+          this.bus_sync(e.data);
+          break;
+          
         default:
           console.log("w: " + e.data);
       }
     }.bind(this);
+    this.mmio_write_buffer = [];
     this.set_freq_limit(this.bus_freq_limit);
     this.set_int_freq_scale_limit(this.int_cont_freq_scale);
-    if(this.last_loaded_files.length > 0){
-      
+  }
+
+  add_mmio_update(addr, size, value){
+    for (let i = 0; i < size; i++) {
+      this.mmio_write_buffer[addr + i] = (value >> (i*8)) & 0xFF;
     }
+  }
+
+  bus_sync(data){
+    if(data.stdout.length > 0) this.stdio_ch.postMessage({fh:1, data:data.stdout});
+    if(data.stderr.length > 0) this.stdio_ch.postMessage({fh:2, data:data.stderr});
+    for (const i in data.mmio_buffer) {
+      mmio.memory[1][i] = data.mmio_buffer[i];
+    }
+    setTimeout( _ => {
+      this.simulator.postMessage({type:"sync", buffer:this.mmio_write_buffer});
+      this.mmio_write_buffer = [];
+    }, 0);
   }
 
   start_execution(args){
     this.simulator.postMessage({type: "add_files", files: this.last_loaded_files});
     this.sim_status_ch.postMessage({type: "status", status:{starting_exec: true, args}});
     this.simulator.postMessage({type: "start", args});
+    setTimeout( _ => {
+      this.simulator.postMessage({type:"sync", buffer:this.mmio_write_buffer});
+      this.mmio_write_buffer = [];
+    }, 0)
   }
 
   load_syscall(number, code, desc){
@@ -124,7 +137,7 @@ class SimulatorController{
     }else{
       this.simulator.postMessage({type: "interrupt_enabled", value: 1});
     }
-    this.simulator.postMessage({type: "set_int_delay", value: 10**(10 - value)});
+    this.simulator.postMessage({type: "set_int_delay", value: (2**(32 - value)) - 1});
   }
 
   set_freq_limit(value){
@@ -134,7 +147,7 @@ class SimulatorController{
 
   restart_simulator(){
     this.simulator.terminate();
-    this.sim_status_ch.postMessage({type:"status", status:{running:false}});
+    this.sim_status_ch.postMessage({type:"status", status:{stopping:true}});
     this.startSimulator();
   }
 

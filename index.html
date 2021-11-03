@@ -121,7 +121,7 @@
                     <div class="row" id="selected_content" hidden="true" style="height: 100%;width: 100%;"></div>
                 </div>
             </div>
-            <div id="hardware_tab" class="content_area" hidden="true">
+            <div id="hardware_tab" class="content_area">
                 <div class="container">
                     <div class="row">
                         <div class="col-md-6">
@@ -143,8 +143,7 @@
                                                 <div class="custom-control custom-control-inline custom-checkbox" style="width: 34px;"><input class="custom-control-input" type="checkbox" id="config_isaS" checked=""><label class="custom-control-label" for="config_isaS">S</label></div>
                                                 <div class="custom-control custom-control-inline custom-checkbox" style="width: 34px;"><input class="custom-control-input" type="checkbox" id="config_isaU" checked=""><label class="custom-control-label" for="config_isaU">U</label></div>
                                             </div>
-                                            <div class="form-group"><label class="d-inline-block">Int. Controller Freq. Scaling:&nbsp;&nbsp;</label><input class="custom-range d-inline-block" type="range" id="int_freq_range" min="0" max="7" step="1" value="0" style="width: 230px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="int_freq_range_indicator">1/∞<br></small></div>
-                                            <div class="form-group"><label class="d-inline-block">Bus Frequency Limit:&nbsp;</label><input class="custom-range d-inline-block" type="range" id="bus_frequency_range" min="1" max="1000" step="1" value="30" style="width: 288px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="bus_frequency_range_indicator">30Hz</small></div>
+                                            <div class="form-group"><label class="d-inline-block">Bus Frequency Scaling:&nbsp;&nbsp;</label><input class="custom-range d-inline-block" type="range" id="int_freq_range" min="0" max="32" step="1" value="25" style="width: 230px;padding-top: 14px;" name="bus_freq"><small class="form-text text-monospace text-muted d-inline" id="int_freq_range_indicator">1/∞<br></small></div>
                                         </fieldset>
                                     </form>
                                 </div>
@@ -244,7 +243,7 @@
                     </div>
                 </div>
             </div>
-            <div id="settings_tab" class="content_area">
+            <div id="settings_tab" class="content_area" hidden="true">
                 <div class="container">
                     <div class="row">
                         <div class="col">
