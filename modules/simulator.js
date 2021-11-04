@@ -8,6 +8,10 @@ class MMIO{
     this.size = this.sharedBuffer.byteLength;
   }
 
+  reset(){
+    this.memory[4].fill(0)
+  }
+
   load(addr, size){
     addr &= 0xFFFF;
     return this.memory[size][(addr/size) | 0];
@@ -68,6 +72,7 @@ class SimulatorController{
           console.log("w: " + e.data);
       }
     }.bind(this);
+    mmio.reset();
     this.mmio_write_buffer = [];
     this.set_freq_limit(this.bus_freq_limit);
     this.set_int_freq_scale_limit(this.int_cont_freq_scale);
