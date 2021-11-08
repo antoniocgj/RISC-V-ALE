@@ -195,6 +195,7 @@ class ConfigurationManager{
         document.getElementById(opt).value = this.currentConfig.options[opt];
       }
     }
+    freq_change();
     // devices
     for (const name in this.currentConfig.devices) {
       mmio_manager.getSlot(name.slot);
