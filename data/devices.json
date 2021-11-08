@@ -24,6 +24,11 @@
       "name": "Canvas",
       "desc": "Canvas for drawing and displaying images",
       "action": "canvas.js"
+    },
+    {
+      "name": "Serial IO",
+      "desc": "Serial port for text input and output.",
+      "action": "serial_port.js"
     }
   ]
 }

@@ -3,7 +3,7 @@
 var stdinBuffer = new Uint8Array([]);
 var non_blocking_io = false;
 var interactiveBufferString = "";
-var mem_write_delay = 30;
+var syscall_delay = 30;
 var simulator_sleep = [1, 1, 1]; // int, read, write
 var simulator_int_inst_delay = 1000;
 
@@ -193,9 +193,9 @@ class SyscallEmulator{
     if(a7 in this.syscalls){
       var sendMessage = function(msg){
         postMessage({type: "device_message", syscall: a7, message: msg});
-        if(mem_write_delay){
+        if(syscall_delay){
           let start = performance.now();
-          while(performance.now() - start < mem_write_delay);
+          while(performance.now() - start < syscall_delay);
         }
       };
       eval(this.syscalls[a7]);

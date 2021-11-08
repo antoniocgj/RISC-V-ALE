@@ -61,8 +61,14 @@ class SimulatorController{
           this.bus_ch.postMessage({so_emulation:true, syscall: e.data.syscall, data: e.data.message});
           break;
         case "sim_log":
-        case "status":
           this.sim_status_ch.postMessage(e.data);
+          break;
+        case "status":
+          if(e.data.status.finish){
+            this.restart_simulator();
+          }else{
+            this.sim_status_ch.postMessage(e.data);
+          }
           break;
         case 'sync':
           this.bus_sync(e.data);
