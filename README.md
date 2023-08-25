@@ -22,6 +22,9 @@ This project includes code or (wasm-compiled) objects from the following project
 - chipsalliance/SweRV-ISS (Now [VeeR-ISS](https://github.com/chipsalliance/VeeR-ISS)): [Apache License 2.0](./modules/LICENSE_whisper)
   - Source code of our modified version: https://github.com/antoniocgj/SweRV-ISS-1
 - [The LLVM Project](http://llvm.org): [Apache License 2.0](./modules/LICENSE_clang_lld)
+- [Bootstrap](https://getbootstrap.com/): [MIT License](https://github.com/twbs/bootstrap/blob/main/LICENSE)
+- [Font Awesome Free 5.12.0](https://fontawesome.com): [License](https://fontawesome.com/license/free ) (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+- [Material Design](https://github.com/google/material-design-icons): [Apache 2.0 License](https://github.com/google/material-design-icons/blob/master/LICENSE)
 - [Pnotify.js](https://github.com/sciactive/pnotify): [Apache License 2.0](https://github.com/sciactive/pnotify/blob/master/LICENSE)
 - [Bootstrap-table](https://bootstrap-table.com): [MIT License](https://github.com/wenzhixin/bootstrap-table/blob/develop/LICENSE)
 - [jQuery UI](http://jqueryui.com)
