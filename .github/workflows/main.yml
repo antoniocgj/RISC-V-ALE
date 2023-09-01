@@ -1,0 +1,7 @@
+- name: JSDoc Action
+  uses: andstor/jsdoc-action@v1.2.1
+  with:
+    source_dir: ./modules
+    recurse: false
+    template: ink-docstrap
+    output_dir: ./docs
