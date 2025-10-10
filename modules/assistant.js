@@ -106,17 +106,25 @@ export class Assistant_Script{
       var stdoutBufferSize = this.stdoutBuffer.length;
       this.stdio_ch.postMessage({fh:-1, debug:true, cmd});
       await this.wait_for_output({timeout});
-      await this.sleep(500);
       return this.stdoutBuffer.slice(stdoutBufferSize);
     };
 
     this.wait_for_output = async function({msg="", size=1, fh=1, timeout=5000, bufferStart=0} = {}) {
       return new Promise(resolve =>{
-        this.stdioCallback = function () {
-          var stdioHandler = [this.stdoutBuffer, this.stderrBuffer][fh - 1]; 
-          if(stdioHandler.slice(bufferStart).includes(msg) && (stdioHandler.length - bufferStart >= size)) resolve();
-        }.bind(this);
-        setTimeout(resolve, timeout);
+      let timeoutId;
+      
+      this.stdioCallback = function () {
+        var stdioHandler = [this.stdoutBuffer, this.stderrBuffer][fh - 1]; 
+        if(stdioHandler.slice(bufferStart).includes(msg) && (stdioHandler.length - bufferStart >= size)) {
+        clearTimeout(timeoutId);
+        resolve();
+        }
+      }.bind(this);
+      
+      timeoutId = setTimeout(() => {
+        this.stdioCallback = undefined;
+        resolve();
+      }, timeout);
       });
     }
 
