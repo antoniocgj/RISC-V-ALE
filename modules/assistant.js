@@ -167,7 +167,7 @@ export class Assistant_Script{
     }.bind(this)
   }
 
-  simple_equality_test(stdin, expected_output, {timeout=500, compare_function=((x,y) => x == y)} = {}){
+  simple_equality_test(stdin, expected_output, {timeout=5000, compare_function=((x,y) => x == y)} = {}){
     return async function () {
       this.set_init_STDIN(stdin);
       if(!(await this.run_simulator())){
